@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: postgres_container
+    restart: always
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: Test1234!
+      POSTGRES_DB: pet_registry
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
