@@ -9,7 +9,10 @@ import com.petreg.prototype.dto.UserCreateDto;
 import com.petreg.prototype.dto.UserResponseDto;
 import com.petreg.prototype.dto.UserUpdateDto;
 import com.petreg.prototype.mapper.UserMapper;
+import com.petreg.prototype.model.Role;
 import com.petreg.prototype.model.User;
+import com.petreg.prototype.model.type.RoleEnum;
+import com.petreg.prototype.repository.RoleRepository;
 import com.petreg.prototype.repository.UserRepository;
 
 @Service
@@ -18,14 +21,24 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper) {
+    private final RoleRepository roleRepository;
+
+    public UserService(UserRepository userRepository, UserMapper userMapper,
+            RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.roleRepository = roleRepository;
     }
 
     // Create
     public UserResponseDto createUser(UserCreateDto input) {
         User user = userMapper.fromDto(input);
+        // Default to OWNER role
+        Role ownerRole = roleRepository.findByName(RoleEnum.OWNER)
+            .orElseThrow(() -> new RuntimeException(
+                "Role with name " + RoleEnum.OWNER + " not found"
+            ));
+        user.getRoles().add(ownerRole);
         return userMapper.toDto(userRepository.save(user));
     }
 
