@@ -53,7 +53,7 @@ public class Microchip {
         this.supplier = supplier;
     }
 
-    public boolean isInUse() {
+    public boolean getInUse() {
         return inUse;
     }
 
