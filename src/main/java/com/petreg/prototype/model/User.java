@@ -36,6 +36,8 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    // --- Constructors ---
+
     public User() {}
 
     public User(String personalCode, String firstName, String lastName, String email,
@@ -47,6 +49,8 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.address = address;
     }
+
+    // --- Getters and setters ---
 
     public Long getId() {
         return id;
