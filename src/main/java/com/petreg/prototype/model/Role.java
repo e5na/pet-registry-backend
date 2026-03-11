@@ -3,8 +3,12 @@ package com.petreg.prototype.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.petreg.prototype.model.type.RoleEnum;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,7 +24,8 @@ public class Role {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    private RoleEnum name;
 
     @ManyToMany(mappedBy = "roles")
     private Set<User> users = new HashSet<>();
@@ -29,7 +34,7 @@ public class Role {
 
     public Role() {}
 
-    public Role(String name) {
+    public Role(RoleEnum name) {
         this.name = name;
     }
 
@@ -39,11 +44,11 @@ public class Role {
         return id;
     }
 
-    public String getName() {
+    public RoleEnum getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(RoleEnum name) {
         this.name = name;
     }
 
