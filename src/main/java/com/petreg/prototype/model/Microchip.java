@@ -21,6 +21,8 @@ public class Microchip {
     private String supplier;
     private boolean inUse;
 
+    // --- Constructors ---
+
     public Microchip() {}
 
     public Microchip(int chipNumber, String supplier, boolean inUse) {
@@ -28,6 +30,8 @@ public class Microchip {
         this.supplier = supplier;
         this.inUse = inUse;
     }
+
+    // --- Getters and setters ---
 
     public Long getId() {
         return id;
