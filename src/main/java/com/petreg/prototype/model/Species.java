@@ -18,6 +18,12 @@ public class Species {
     @Column(unique = true, nullable = false)
     private String name;
 
+    public Species() {}
+
+    public Species(String name) {
+        this.name = name;
+    }
+
     public Long getId() {
         return id;
     }
