@@ -32,8 +32,25 @@ public class User {
     private String address;
 
     @ManyToMany
-    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
+
+    // --- Constructors ---
+
+    public User() {}
+
+    public User(String personalCode, String firstName, String lastName, String email,
+            String phoneNumber, String address) {
+        this.personalCode = personalCode;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+    }
+
+    // --- Getters and setters ---
 
     public Long getId() {
         return id;
