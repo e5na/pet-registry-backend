@@ -32,6 +32,12 @@ public class UserService {
 
     // Create
     public UserResponseDto createUser(UserCreateDto input) {
+        if (userRepository.existsByPersonalCode(input.personalCode())) {
+            throw new RuntimeException(
+                "User already exists with personal code: " + input.personalCode()
+            );
+        }
+
         User user = userMapper.fromDto(input);
         // Default to OWNER role
         Role ownerRole = roleRepository.findByName(RoleEnum.OWNER)
