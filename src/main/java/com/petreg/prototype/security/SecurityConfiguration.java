@@ -12,10 +12,11 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfiguration {
 
     // Disable any authentication for now
-    // FIXME: Remove/change this temporary workaround 
+    // FIXME: Remove/change this temporary workaround
     @Bean
     SecurityFilterChain configure(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
+        http
+            .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth ->
                 auth.anyRequest().permitAll()
             );
