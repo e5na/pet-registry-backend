@@ -8,6 +8,7 @@ public record UserCreateDto(
     String lastName,
     String email,
     String phoneNumber,
+    String password,
     OwnerProfileCreateDto ownerProfile
 ) {
     @AssertTrue(message = "At least one profile must be selected")

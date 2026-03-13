@@ -44,6 +44,7 @@ public class UserMapper {
             dto.lastName(),
             dto.email(),
             dto.phoneNumber(),
+            dto.password(),
             OwnerProfileMapper.fromDto(dto.ownerProfile())
         );
         // This back link is crucial
@@ -75,6 +76,8 @@ public class UserMapper {
         if (dto.phoneNumber() != null) {
             user.setPhoneNumber(dto.phoneNumber());
         }
+
+        // No password update here, this is intentional
 
         if (dto.ownerProfile() != null) {
             // Update already existing profile
