@@ -36,6 +36,7 @@ public class UserMapper {
     public User fromDto(UserCreateDto dto) {
         return new User(
             dto.personalCode(),
+            dto.password(),
             dto.firstName(),
             dto.lastName(),
             dto.email(),
@@ -50,6 +51,8 @@ public class UserMapper {
         if (dto.personalCode() != null) {
             user.setPersonalCode(dto.personalCode());
         }
+
+        // TODO: Password update?
 
         if (dto.firstName() != null) {
             user.setFirstName(dto.firstName());

@@ -25,6 +25,7 @@ public class User {
     @Column(unique = true)
     private String personalCode;
 
+    private String password;
     private String firstName;
     private String lastName;
     private String email;
@@ -40,9 +41,10 @@ public class User {
 
     public User() {}
 
-    public User(String personalCode, String firstName, String lastName, String email,
-            String phoneNumber, String address) {
+    public User(String personalCode, String password, String firstName, String lastName,
+            String email, String phoneNumber, String address) {
         this.personalCode = personalCode;
+        this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -62,6 +64,14 @@ public class User {
 
     public void setPersonalCode(String personalCode) {
         this.personalCode = personalCode;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getFirstName() {
