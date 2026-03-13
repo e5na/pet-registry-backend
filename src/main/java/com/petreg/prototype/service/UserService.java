@@ -90,4 +90,13 @@ public class UserService {
             ));
         userRepository.delete(user);
     }
+
+    // Retrieve by personal code
+    public UserResponseDto getUserByPersonalCode(String personalCode) {
+        User user = userRepository.findByPersonalCode(personalCode)
+            .orElseThrow(() -> new RuntimeException(
+                "User with personal code " + personalCode + " not found"
+            ));
+        return userMapper.toDto(user);
+    }
 }
