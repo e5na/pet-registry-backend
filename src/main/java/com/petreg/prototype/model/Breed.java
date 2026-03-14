@@ -24,6 +24,13 @@ public class Breed {
     @JoinColumn(name = "species_id", nullable = false)
     private Species species;
 
+    public Breed() {}
+
+    public Breed(String name, Species species) {
+        this.name = name;
+        this.species = species;
+    }
+
     public Long getId() {
         return id;
     }

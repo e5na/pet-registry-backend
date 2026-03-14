@@ -8,7 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -26,7 +25,6 @@ public class Pet {
     private LocalDate birthDate;
     private String color;
 
-    @Lob
     @Column(name = "image_data", columnDefinition = "BYTEA")
     private byte[] picture;
 
@@ -45,6 +43,28 @@ public class Pet {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    public Pet() {}
+
+    public Pet(
+        String name,
+        char sex,
+        LocalDate birthDate,
+        String color,
+        Species species,
+        Breed breed,
+        Microchip microchip,
+        User owner
+    ) {
+        this.name = name;
+        this.sex = sex;
+        this.birthDate = birthDate;
+        this.color = color;
+        this.species = species;
+        this.breed = breed;
+        this.microchip = microchip;
+        this.owner = owner;
+    }
 
     public Long getId() {
         return id;
