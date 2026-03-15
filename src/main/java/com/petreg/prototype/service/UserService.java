@@ -1,6 +1,8 @@
 package com.petreg.prototype.service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -34,12 +36,23 @@ public class UserService {
     // Create
     public UserResponseDto createUser(UserCreateDto input) {
         User user = userMapper.fromDto(input);
-        // Default to OWNER role
-        Role ownerRole = roleRepository.findByName(RoleEnum.OWNER)
-            .orElseThrow(() -> new ResourceNotFoundException(
-                "Role with name " + RoleEnum.OWNER + " not found"
-            ));
-        user.getRoles().add(ownerRole);
+
+        // --- Assign roles based on profiles ---
+
+        Set<RoleEnum> profileRoles = new HashSet<>();
+
+        if (input.ownerProfile() != null) {
+            profileRoles.add(RoleEnum.OWNER);
+        }
+
+        profileRoles.forEach(profileRole -> {
+            Role role = roleRepository.findByName(profileRole)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Role with name " + profileRole + " not found"
+                ));
+            user.getRoles().add(role);
+        });
+
         return userMapper.toDto(userRepository.save(user));
     }
 

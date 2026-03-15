@@ -5,6 +5,7 @@ import jakarta.persistence.GenerationType;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -29,25 +31,36 @@ public class User {
     private String lastName;
     private String email;
     private String phoneNumber;
-    private String address;
 
     @ManyToMany
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private OwnerProfile ownerProfile;
+
     // --- Constructors ---
 
     public User() {}
 
     public User(String personalCode, String firstName, String lastName, String email,
-            String phoneNumber, String address) {
+            String phoneNumber) {
         this.personalCode = personalCode;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.address = address;
+    }
+
+    public User(String personalCode, String firstName, String lastName, String email,
+            String phoneNumber, OwnerProfile ownerProfile) {
+        this.personalCode = personalCode;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.ownerProfile = ownerProfile;
     }
 
     // --- Getters and setters ---
@@ -96,19 +109,19 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public Set<Role> getRoles() {
         return roles;
     }
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public OwnerProfile getOwnerProfile() {
+        return ownerProfile;
+    }
+
+    public void setOwnerProfile(OwnerProfile ownerProfile) {
+        this.ownerProfile = ownerProfile;
     }
 }

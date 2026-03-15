@@ -9,6 +9,7 @@ public record UserResponseDto(
     String lastName,
     String email,
     String phoneNumber,
-    String address,
-    Set<RoleResponseDto> roles
+    Set<RoleResponseDto> roles,
+    // optional profiles
+    OwnerProfileResponseDto ownerProfile
 ) {}
