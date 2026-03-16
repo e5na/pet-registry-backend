@@ -11,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import jakarta.servlet.DispatcherType;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -20,6 +22,8 @@ public class SecurityConfiguration {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
+                // Stop Spring Security re-triggering authentication on /error
+                .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 // Open public endpoints
                 .requestMatchers("/api/auth/**").permitAll()
                 // Secure everything else
