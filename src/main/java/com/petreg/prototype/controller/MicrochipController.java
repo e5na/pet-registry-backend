@@ -61,7 +61,7 @@ public class MicrochipController {
 
     // Delete
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         microchipService.deleteMicrochip(id);
     }
