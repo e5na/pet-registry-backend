@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.petreg.prototype.dto.UserCreateDto;
 import com.petreg.prototype.dto.UserResponseDto;
 import com.petreg.prototype.dto.UserUpdateDto;
+import com.petreg.prototype.exception.ResourceNotFoundException;
 import com.petreg.prototype.mapper.UserMapper;
 import com.petreg.prototype.model.Role;
 import com.petreg.prototype.model.User;
@@ -35,7 +36,7 @@ public class UserService {
         User user = userMapper.fromDto(input);
         // Default to OWNER role
         Role ownerRole = roleRepository.findByName(RoleEnum.OWNER)
-            .orElseThrow(() -> new RuntimeException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Role with name " + RoleEnum.OWNER + " not found"
             ));
         user.getRoles().add(ownerRole);
@@ -45,7 +46,7 @@ public class UserService {
     // Retrieve
     public UserResponseDto getUser(Long id) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "User with id " + id + " not found"
             ));
         return userMapper.toDto(user);
@@ -61,7 +62,7 @@ public class UserService {
     // Update
     public UserResponseDto updateUser(Long id, UserUpdateDto dto) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "User with id " + id + " not found"
             ));
         userMapper.update(dto, user);
@@ -71,9 +72,9 @@ public class UserService {
     // Delete
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "User with id " + id + " not found"
             ));
-        userRepository.deleteById(id);
+        userRepository.delete(user);
     }
 }

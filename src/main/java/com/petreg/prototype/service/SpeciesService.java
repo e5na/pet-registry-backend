@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.petreg.prototype.dto.SpeciesCreateDto;
 import com.petreg.prototype.dto.SpeciesResponseDto;
 import com.petreg.prototype.dto.SpeciesUpdateDto;
+import com.petreg.prototype.exception.ResourceNotFoundException;
 import com.petreg.prototype.mapper.SpeciesMapper;
 import com.petreg.prototype.model.Species;
 import com.petreg.prototype.repository.SpeciesRepository;
@@ -43,7 +44,9 @@ public class SpeciesService {
     // Retrieve by ID
     public SpeciesResponseDto getSpecies(Long id) {
         Species species = speciesRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Species with id " + id + " not found"
+            ));
 
         return speciesMapper.toDto(species);
     }
@@ -52,7 +55,9 @@ public class SpeciesService {
     @Transactional
     public SpeciesResponseDto updateSpecies(Long id, SpeciesUpdateDto dto) {
         Species species = speciesRepository.findById(id)
-            .orElseThrow();
+             .orElseThrow(() -> new ResourceNotFoundException(
+                "Species with id " + id + " not found"
+            ));
 
         speciesMapper.update(dto, species);
         return speciesMapper.toDto(species);
@@ -62,10 +67,11 @@ public class SpeciesService {
     @Transactional
     public void deleteSpecies(Long id) {
 
-        if (!speciesRepository.existsById(id)) {
-            throw new RuntimeException("Species with id " + id + " not found");
-        }
+        Species species = speciesRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Species with id " + id + " not found"
+            ));
 
-        speciesRepository.deleteById(id);
+        speciesRepository.delete(species);
     }
 }

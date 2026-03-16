@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import com.petreg.prototype.dto.PetCreateDto;
 import com.petreg.prototype.dto.PetResponseDto;
 import com.petreg.prototype.dto.PetUpdateDto;
+import com.petreg.prototype.exception.ResourceNotFoundException;
+import com.petreg.prototype.exception.ConflictException;
+import com.petreg.prototype.exception.BadRequestException;
 import com.petreg.prototype.mapper.PetMapper;
 import com.petreg.prototype.model.Breed;
 import com.petreg.prototype.model.Microchip;
@@ -52,20 +55,30 @@ public class PetService {
     public PetResponseDto createPet(PetCreateDto dto) {
 
         Species species = speciesRepository.findById(dto.speciesId())
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Species with id " + dto.speciesId() + " not found"
+            ));
 
         Breed breed = breedRepository.findById(dto.breedId())
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Breed with id " + dto.breedId() + " not found"
+            ));
+
+        if (!breed.getSpecies().getId().equals(species.getId())) {
+            throw new BadRequestException("Breed does not belong to the selected species");
+        }
 
         Microchip microchip = null;
         User owner = null;
 
         if (dto.microchipId() != null) {
             microchip = microchipRepository.findById(dto.microchipId())
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Microchip with id " + dto.microchipId() + " not found"
+                ));
 
             if (microchip.getInUse()) {
-                throw new RuntimeException("Microchip already assigned to another pet");
+                throw new ConflictException("Microchip already assigned to another pet");
             }
 
             microchip.setInUse(true);
@@ -73,7 +86,9 @@ public class PetService {
 
         if (dto.ownerId() != null) {
             owner = userRepository.findById(dto.ownerId())
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Owner with id " + dto.ownerId() + " not found"
+                ));
         }
 
         Pet pet = petMapper.fromDto(dto, species, breed, microchip, owner);
@@ -94,7 +109,9 @@ public class PetService {
 
         Pet pet = petRepository
                 .findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Pet with id " + id + " not found"
+                ));
 
         return petMapper.toDto(pet);
     }
@@ -104,7 +121,9 @@ public class PetService {
     public PetResponseDto updatePet(Long id, PetUpdateDto dto) {
 
         Pet pet = petRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Pet with id " + id + " not found"
+                ));
 
         Species species = null;
         Breed breed = null;
@@ -113,24 +132,30 @@ public class PetService {
 
         if (dto.speciesId() != null) {
             species = speciesRepository.findById(dto.speciesId())
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Species with id " + dto.speciesId() + " not found"
+                ));
         }
 
         if (dto.breedId() != null) {
             breed = breedRepository.findById(dto.breedId())
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Breed with id " + dto.breedId() + " not found"
+                ));
         }
 
         if (dto.microchipId() != null) {
             if (pet.getMicrochip() != null) {
-                throw new RuntimeException("Pet already has a microchip and it cannot be changed");
+                throw new ConflictException("Pet already has a microchip and it cannot be changed");
             }
 
             microchip = microchipRepository.findById(dto.microchipId())
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Microchip with id " + dto.microchipId() + " not found"
+                ));
 
             if (microchip.getInUse()) {
-                throw new RuntimeException("Microchip already assigned to another pet");
+                throw new ConflictException("Microchip already assigned to another pet");
             }
 
             microchip.setInUse(true);
@@ -139,7 +164,9 @@ public class PetService {
 
         if (dto.ownerId() != null) {
             owner = userRepository.findById(dto.ownerId())
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Owner with id " + dto.ownerId() + " not found"
+                ));
         }
 
         petMapper.update(dto, pet, species, breed, microchip, owner);
@@ -150,10 +177,11 @@ public class PetService {
     @Transactional
     public void deletePet(Long id) {
 
-        if (!petRepository.existsById(id)) {
-            throw new RuntimeException("Pet with id " + id + " not found");
-        }
+        Pet pet = petRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Pet with id " + id + " not found"
+            ));
 
-        petRepository.deleteById(id);
+        petRepository.delete(pet);
     }
 }
