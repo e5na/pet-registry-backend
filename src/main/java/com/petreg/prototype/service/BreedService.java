@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.petreg.prototype.dto.BreedCreateDto;
 import com.petreg.prototype.dto.BreedResponseDto;
 import com.petreg.prototype.dto.BreedUpdateDto;
+import com.petreg.prototype.exception.ResourceNotFoundException;
 import com.petreg.prototype.mapper.BreedMapper;
 import com.petreg.prototype.model.Breed;
 import com.petreg.prototype.model.Species;
@@ -37,7 +38,9 @@ public class BreedService {
     public BreedResponseDto createBreed(BreedCreateDto dto) {
 
         Species species = speciesRepository.findById(dto.speciesId())
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Species with id " + dto.speciesId() + " not found"
+            ));
 
         Breed breed = breedMapper.fromDto(dto, species);
         return breedMapper.toDto(breedRepository.save(breed));
@@ -56,7 +59,9 @@ public class BreedService {
     public BreedResponseDto getBreed(Long id) {
 
         Breed breed = breedRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Breed with id " + id + " not found"
+            ));
 
         return breedMapper.toDto(breed);
     }
@@ -66,13 +71,17 @@ public class BreedService {
     public BreedResponseDto updateBreed(Long id, BreedUpdateDto dto) {
 
         Breed breed = breedRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Breed with id " + id + " not found"
+            ));
 
         Species species = null;
 
         if (dto.speciesId() != null) {
             species = speciesRepository.findById(dto.speciesId())
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException(
+                    "Species with id " + dto.speciesId() + " not found"
+                ));
         }
 
         breedMapper.update(dto, breed, species);
@@ -84,7 +93,7 @@ public class BreedService {
     public void deleteBreed(Long id) {
 
         if (!breedRepository.existsById(id)) {
-            throw new RuntimeException("Breed with id " + id + " not found");
+            throw new ResourceNotFoundException("Breed with id " + id + " not found");
         }
 
         breedRepository.deleteById(id);

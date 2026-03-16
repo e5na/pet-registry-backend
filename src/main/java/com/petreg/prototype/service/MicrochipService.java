@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.petreg.prototype.dto.MicrochipCreateDto;
 import com.petreg.prototype.dto.MicrochipResponseDto;
 import com.petreg.prototype.dto.MicrochipUpdateDto;
+import com.petreg.prototype.exception.ResourceNotFoundException;
 import com.petreg.prototype.mapper.MicrochipMapper;
 import com.petreg.prototype.model.Microchip;
 import com.petreg.prototype.repository.MicrochipRepository;
@@ -33,7 +34,7 @@ public class MicrochipService {
     // Retrieve
     public MicrochipResponseDto getMicrochip(Long id) {
         Microchip microchip = microchipRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Microchip with id " + id + " not found"
             ));
         return microchipMapper.toDto(microchip);
@@ -49,7 +50,7 @@ public class MicrochipService {
     // Update
     public MicrochipResponseDto updateMicrochip(Long id, MicrochipUpdateDto dto) {
         Microchip microchip = microchipRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Microchip with id " + id + " not found"
             ));
         microchipMapper.update(dto, microchip);
@@ -59,9 +60,9 @@ public class MicrochipService {
     // Delete
     public void deleteMicrochip(Long id) {
         Microchip microchip = microchipRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Microchip with id " + id + " not found"
             ));
-        microchipRepository.deleteById(id);
+        microchipRepository.delete(microchip);
     }
 }

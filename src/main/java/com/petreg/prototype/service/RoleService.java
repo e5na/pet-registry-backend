@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.petreg.prototype.dto.RoleCreateDto;
 import com.petreg.prototype.dto.RoleResponseDto;
 import com.petreg.prototype.dto.RoleUpdateDto;
+import com.petreg.prototype.exception.ResourceNotFoundException;
 import com.petreg.prototype.mapper.RoleMapper;
 import com.petreg.prototype.model.Role;
 import com.petreg.prototype.repository.RoleRepository;
@@ -33,7 +34,7 @@ public class RoleService {
     // Retrieve
     public RoleResponseDto getRole(Long id) {
         Role role = roleRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Role with id " + id + " not found"
             ));
         return roleMapper.toDto(role);
@@ -49,7 +50,7 @@ public class RoleService {
     // Update
     public RoleResponseDto updateRole(Long id, RoleUpdateDto dto) {
         Role role = roleRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Role with id " + id + " not found"
             ));
         roleMapper.update(dto, role);
@@ -59,9 +60,9 @@ public class RoleService {
     // Delete
     public void deleteRole(Long id) {
         Role role = roleRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "Role with id " + id + " not found"
             ));
-        roleRepository.deleteById(id);
+        roleRepository.delete(role);
     }
 }
