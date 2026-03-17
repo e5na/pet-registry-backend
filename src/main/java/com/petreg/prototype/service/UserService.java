@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.petreg.prototype.dto.UserCreateDto;
@@ -26,16 +27,28 @@ public class UserService {
 
     private final RoleRepository roleRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
     public UserService(UserRepository userRepository, UserMapper userMapper,
-            RoleRepository roleRepository) {
+            RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // Create
     public UserResponseDto createUser(UserCreateDto input) {
+        if (userRepository.existsByPersonalCode(input.personalCode())) {
+            throw new RuntimeException(
+                "User already exists with personal code: " + input.personalCode()
+            );
+        }
+
         User user = userMapper.fromDto(input);
+
+        // Encode the password which the mapper doesn't do at the moment
+        user.setPassword(passwordEncoder.encode(input.password()));
 
         // --- Assign roles based on profiles ---
 
@@ -89,5 +102,14 @@ public class UserService {
                 "User with id " + id + " not found"
             ));
         userRepository.delete(user);
+    }
+
+    // Retrieve by personal code
+    public UserResponseDto getUserByPersonalCode(String personalCode) {
+        User user = userRepository.findByPersonalCode(personalCode)
+            .orElseThrow(() -> new RuntimeException(
+                "User with personal code " + personalCode + " not found"
+            ));
+        return userMapper.toDto(user);
     }
 }

@@ -31,6 +31,7 @@ public class User {
     private String lastName;
     private String email;
     private String phoneNumber;
+    private String password;
 
     @ManyToMany
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"),
@@ -44,22 +45,24 @@ public class User {
 
     public User() {}
 
-    public User(String personalCode, String firstName, String lastName, String email,
-            String phoneNumber) {
+    public User(String personalCode, String firstName, String lastName,
+            String email, String phoneNumber, String password) {
         this.personalCode = personalCode;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.password = password;
     }
 
-    public User(String personalCode, String firstName, String lastName, String email,
-            String phoneNumber, OwnerProfile ownerProfile) {
+    public User(String personalCode, String firstName, String lastName,
+            String email, String phoneNumber, String password, OwnerProfile ownerProfile) {
         this.personalCode = personalCode;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.password = password;
         this.ownerProfile = ownerProfile;
     }
 
@@ -107,6 +110,14 @@ public class User {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Set<Role> getRoles() {
