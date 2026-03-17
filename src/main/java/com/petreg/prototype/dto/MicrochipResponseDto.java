@@ -1,8 +1,8 @@
 package com.petreg.prototype.dto;
 
 public record MicrochipResponseDto(
-    Long id,
-    String chipNumber,
-    String supplier,
-    boolean inUse
-) {}
+        Long id,
+        String microchipNumber,
+        String supplier,
+        boolean inUse) {
+}
