@@ -6,5 +6,5 @@ public record UserUpdateDto(
     String lastName,
     String email,
     String phoneNumber,
-    String address
+    OwnerProfileUpdateDto ownerProfile
 ) {}
