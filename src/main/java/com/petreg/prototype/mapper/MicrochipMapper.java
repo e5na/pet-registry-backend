@@ -21,7 +21,7 @@ public class MicrochipMapper {
     public Microchip fromDto(MicrochipCreateDto dto) {
         return new Microchip(
                 dto.microchipNumber(),
-                dto.supplier(),
+                dto.importer(),
                 false);
     }
 
@@ -32,8 +32,8 @@ public class MicrochipMapper {
             microchip.setMicrochipNumber(dto.microchipNumber());
         }
 
-        if (dto.supplier() != null) {
-            microchip.setImporter(dto.supplier());
+        if (dto.importer() != null) {
+            microchip.setImporter(dto.importer());
         }
 
         if (dto.inUse() != null) {
