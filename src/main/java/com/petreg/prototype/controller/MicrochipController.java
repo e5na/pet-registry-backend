@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,8 +48,14 @@ public class MicrochipController {
     // Retrieve all
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<MicrochipResponseDto> all() {
-        return microchipService.getAllMicrochips();
+    public List<MicrochipResponseDto> all(
+        @RequestParam(required = false) String chipNumber
+    ) {
+        if (chipNumber == null || chipNumber.isBlank()) {
+            return microchipService.getAllMicrochips();
+        }
+
+        return microchipService.searchMicrochips(chipNumber);
     }
 
     // Update
