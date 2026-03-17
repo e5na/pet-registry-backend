@@ -7,15 +7,15 @@ import jakarta.validation.constraints.NotNull;
 
 public record PetCreateDto(
 
-    @NotBlank String name,
-    @NotNull Character sex,
-    @NotNull LocalDate birthDate,
-    @NotBlank String color,
-    @NotNull Long speciesId,
-    @NotNull Long breedId,
+        @NotBlank String name,
+        @NotNull Character sex,
+        @NotNull LocalDate birthDate,
+        @NotBlank String color,
+        @NotNull Long speciesId,
+        @NotNull Long breedId,
 
-    Long microchipId,
-    Long ownerId,
-    byte[] picture
+        Long microchipId,
+        Long ownerId
 
-) {}
+) {
+}
