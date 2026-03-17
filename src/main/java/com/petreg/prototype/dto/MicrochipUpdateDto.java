@@ -1,7 +1,7 @@
 package com.petreg.prototype.dto;
 
 public record MicrochipUpdateDto(
-    Integer chipNumber,
+    String chipNumber,
     String supplier,
     Boolean inUse
 ) {}
