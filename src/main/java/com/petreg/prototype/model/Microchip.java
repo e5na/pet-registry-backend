@@ -16,7 +16,7 @@ public class Microchip {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private int chipNumber;
+    private String chipNumber;
 
     private String supplier;
     private boolean inUse;
@@ -25,7 +25,7 @@ public class Microchip {
 
     public Microchip() {}
 
-    public Microchip(int chipNumber, String supplier, boolean inUse) {
+    public Microchip(String chipNumber, String supplier, boolean inUse) {
         this.chipNumber = chipNumber;
         this.supplier = supplier;
         this.inUse = inUse;
@@ -37,11 +37,11 @@ public class Microchip {
         return id;
     }
 
-    public int getChipNumber() {
+    public String getChipNumber() {
         return chipNumber;
     }
 
-    public void setChipNumber(int chipNumber) {
+    public void setChipNumber(String chipNumber) {
         this.chipNumber = chipNumber;
     }
 

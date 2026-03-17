@@ -47,6 +47,16 @@ public class MicrochipService {
             .collect(Collectors.toList());
     }
 
+    // Search by Microchip number
+    public List<MicrochipResponseDto> searchMicrochips(String chipNumber) {
+
+        return microchipRepository
+            .findByChipNumberContainingIgnoreCase(chipNumber)
+            .stream()
+            .map(microchipMapper::toDto)
+            .toList();
+}
+
     // Update
     public MicrochipResponseDto updateMicrochip(Long id, MicrochipUpdateDto dto) {
         Microchip microchip = microchipRepository.findById(id)
