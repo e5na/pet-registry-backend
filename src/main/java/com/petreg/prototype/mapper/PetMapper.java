@@ -14,23 +14,19 @@ import com.petreg.prototype.model.Breed;
 import com.petreg.prototype.model.Microchip;
 import com.petreg.prototype.model.Pet;
 import com.petreg.prototype.model.Picture;
-import com.petreg.prototype.model.Species;
 import com.petreg.prototype.model.User;
 
 @Component
 public class PetMapper {
 
-    private final SpeciesMapper speciesMapper;
     private final BreedMapper breedMapper;
     private final MicrochipMapper microchipMapper;
     private final UserMapper userMapper;
 
     public PetMapper(
-            SpeciesMapper speciesMapper,
             BreedMapper breedMapper,
             MicrochipMapper microchipMapper,
             UserMapper userMapper) {
-        this.speciesMapper = speciesMapper;
         this.breedMapper = breedMapper;
         this.microchipMapper = microchipMapper;
         this.userMapper = userMapper;
@@ -49,7 +45,7 @@ public class PetMapper {
                 pet.getSex(),
                 pet.getBirthDate(),
                 pet.getColor(),
-                speciesMapper.toDto(pet.getBreed().getSpecies()),
+                pet.getStatus(),
                 breedMapper.toDto(pet.getBreed()),
                 pet.getMicrochip() != null ? microchipMapper.toDto(pet.getMicrochip()) : null,
                 pet.getOwner() != null ? userMapper.toDto(pet.getOwner()) : null,
@@ -58,7 +54,6 @@ public class PetMapper {
 
     public Pet fromDto(
             PetCreateDto dto,
-            Species species,
             Breed breed,
             Microchip microchip,
             User owner) {
@@ -68,7 +63,7 @@ public class PetMapper {
                 dto.sex(),
                 dto.birthDate(),
                 dto.color(),
-                species,
+                dto.status(),
                 breed,
                 microchip,
                 owner);
@@ -77,7 +72,6 @@ public class PetMapper {
     public void update(
             PetUpdateDto dto,
             Pet pet,
-            Species species,
             Breed breed,
             Microchip microchip,
             User owner) {
