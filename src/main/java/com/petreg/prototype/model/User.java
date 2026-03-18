@@ -2,8 +2,11 @@ package com.petreg.prototype.model;
 
 import jakarta.persistence.GenerationType;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -24,13 +27,23 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(unique = true, nullable = false)
     private String personalCode;
 
+    @Column(nullable = false)
     private String firstName;
+
+    @Column(nullable = false)
     private String lastName;
+
     private String email;
     private String phoneNumber;
+
+    @Column(nullable = false)
     private String password;
 
     @ManyToMany
@@ -70,6 +83,10 @@ public class User {
 
     public Long getId() {
         return id;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public String getPersonalCode() {

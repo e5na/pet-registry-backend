@@ -18,7 +18,7 @@ public class Microchip {
     @Column(unique = true, nullable = false)
     private String microchipNumber;
     private String importer;
-    private boolean inUse;
+    private boolean inUse = false;
 
     public Microchip() {
     }
