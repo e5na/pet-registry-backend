@@ -12,31 +12,28 @@ public class MicrochipMapper {
 
     public MicrochipResponseDto toDto(Microchip microchip) {
         return new MicrochipResponseDto(
-            microchip.getId(),
-            microchip.getChipNumber(),
-            microchip.getSupplier(),
-            microchip.getInUse()
-        );
+                microchip.getId(),
+                microchip.getMicrochipNumber(),
+                microchip.getImporter(),
+                microchip.getInUse());
     }
 
     public Microchip fromDto(MicrochipCreateDto dto) {
         return new Microchip(
-            dto.chipNumber(),
-            dto.supplier(),
-            // Mark as available by default
-            false
-        );
+                dto.microchipNumber(),
+                dto.importer(),
+                false);
     }
 
     public void update(MicrochipUpdateDto dto, Microchip microchip) {
         // --- Only modify non-null data fields ---
 
-        if (dto.chipNumber() != null) {
-            microchip.setChipNumber(dto.chipNumber());
+        if (dto.microchipNumber() != null) {
+            microchip.setMicrochipNumber(dto.microchipNumber());
         }
 
-        if (dto.supplier() != null) {
-            microchip.setSupplier(dto.supplier());
+        if (dto.importer() != null) {
+            microchip.setImporter(dto.importer());
         }
 
         if (dto.inUse() != null) {

@@ -51,7 +51,7 @@ public class MicrochipService {
     public List<MicrochipResponseDto> searchMicrochips(String chipNumber) {
 
         return microchipRepository
-            .findByChipNumberContainingIgnoreCase(chipNumber)
+            .findByMicrochipNumberContainingIgnoreCase(chipNumber)
             .stream()
             .map(microchipMapper::toDto)
             .toList();

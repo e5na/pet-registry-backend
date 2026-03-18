@@ -1,14 +1,17 @@
 package com.petreg.prototype.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
-import jakarta.persistence.Column;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
@@ -25,13 +28,6 @@ public class Pet {
     private LocalDate birthDate;
     private String color;
 
-    @Column(name = "image_data", columnDefinition = "BYTEA")
-    private byte[] picture;
-
-    @ManyToOne
-    @JoinColumn(name = "species_id")
-    private Species species;
-
     @ManyToOne
     @JoinColumn(name = "breed_id")
     private Breed breed;
@@ -44,23 +40,25 @@ public class Pet {
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    public Pet() {}
+    @OneToMany(mappedBy = "pet", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Picture> pictures = new ArrayList<>();
+
+    public Pet() {
+    }
 
     public Pet(
-        String name,
-        char sex,
-        LocalDate birthDate,
-        String color,
-        Species species,
-        Breed breed,
-        Microchip microchip,
-        User owner
-    ) {
+            String name,
+            char sex,
+            LocalDate birthDate,
+            String color,
+            Species species,
+            Breed breed,
+            Microchip microchip,
+            User owner) {
         this.name = name;
         this.sex = sex;
         this.birthDate = birthDate;
         this.color = color;
-        this.species = species;
         this.breed = breed;
         this.microchip = microchip;
         this.owner = owner;
@@ -102,20 +100,12 @@ public class Pet {
         this.color = color;
     }
 
-    public byte[] getPicture() {
-        return picture;
+    public List<Picture> getPictures() {
+        return pictures;
     }
 
-    public void setPicture(byte[] picture) {
-        this.picture = picture;
-    }
-
-    public Species getSpecies() {
-        return species;
-    }
-
-    public void setSpecies(Species species) {
-        this.species = species;
+    public void setPictures(List<Picture> pictures) {
+        this.pictures = pictures;
     }
 
     public Breed getBreed() {

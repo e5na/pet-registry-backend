@@ -8,6 +8,6 @@ import com.petreg.prototype.model.Microchip;
 
 public interface MicrochipRepository extends JpaRepository<Microchip, Long> {
 
-    public List<Microchip> findByChipNumberContainingIgnoreCase(String chipNumber);
+    public List<Microchip> findByMicrochipNumberContainingIgnoreCase(String microchipNumber);
 
 }

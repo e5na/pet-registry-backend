@@ -16,41 +16,37 @@ public class Microchip {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String chipNumber;
-
-    private String supplier;
+    private String microchipNumber;
+    private String importer;
     private boolean inUse;
 
-    // --- Constructors ---
-
-    public Microchip() {}
-
-    public Microchip(String chipNumber, String supplier, boolean inUse) {
-        this.chipNumber = chipNumber;
-        this.supplier = supplier;
-        this.inUse = inUse;
+    public Microchip() {
     }
 
-    // --- Getters and setters ---
+    public Microchip(String microchipNumber, String importer, boolean inUse) {
+        this.microchipNumber = microchipNumber;
+        this.importer = importer;
+        this.inUse = inUse;
+    }
 
     public Long getId() {
         return id;
     }
 
-    public String getChipNumber() {
-        return chipNumber;
+    public String getMicrochipNumber() {
+        return microchipNumber;
     }
 
-    public void setChipNumber(String chipNumber) {
-        this.chipNumber = chipNumber;
+    public void setMicrochipNumber(String microchipNumber) {
+        this.microchipNumber = microchipNumber;
     }
 
-    public String getSupplier() {
-        return supplier;
+    public String getImporter() {
+        return importer;
     }
 
-    public void setSupplier(String supplier) {
-        this.supplier = supplier;
+    public void setImporter(String importer) {
+        this.importer = importer;
     }
 
     public boolean getInUse() {

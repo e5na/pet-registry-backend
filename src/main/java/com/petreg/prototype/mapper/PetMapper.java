@@ -1,13 +1,19 @@
 package com.petreg.prototype.mapper;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Component;
 
 import com.petreg.prototype.dto.PetCreateDto;
 import com.petreg.prototype.dto.PetResponseDto;
 import com.petreg.prototype.dto.PetUpdateDto;
+import com.petreg.prototype.dto.PictureResponseDto;
 import com.petreg.prototype.model.Breed;
 import com.petreg.prototype.model.Microchip;
 import com.petreg.prototype.model.Pet;
+import com.petreg.prototype.model.Picture;
 import com.petreg.prototype.model.Species;
 import com.petreg.prototype.model.User;
 
@@ -20,11 +26,10 @@ public class PetMapper {
     private final UserMapper userMapper;
 
     public PetMapper(
-        SpeciesMapper speciesMapper,
-        BreedMapper breedMapper,
-        MicrochipMapper microchipMapper,
-        UserMapper userMapper
-    ) {
+            SpeciesMapper speciesMapper,
+            BreedMapper breedMapper,
+            MicrochipMapper microchipMapper,
+            UserMapper userMapper) {
         this.speciesMapper = speciesMapper;
         this.breedMapper = breedMapper;
         this.microchipMapper = microchipMapper;
@@ -32,55 +37,50 @@ public class PetMapper {
     }
 
     public PetResponseDto toDto(Pet pet) {
+        List<PictureResponseDto> pictureDtos = pet.getPictures() != null
+                ? pet.getPictures().stream()
+                        .map(p -> new PictureResponseDto(p.getId(), p.getFileName(), p.getPicture()))
+                        .collect(Collectors.toList())
+                : Collections.emptyList();
 
         return new PetResponseDto(
-            pet.getId(),
-            pet.getName(),
-            pet.getSex(),
-            pet.getBirthDate(),
-            pet.getColor(),
-            speciesMapper.toDto(pet.getSpecies()),
-            breedMapper.toDto(pet.getBreed()),
-            pet.getMicrochip() != null ? microchipMapper.toDto(pet.getMicrochip()) : null,
-            pet.getOwner() != null ? userMapper.toDto(pet.getOwner()) : null,
-            pet.getPicture()
-        );
+                pet.getId(),
+                pet.getName(),
+                pet.getSex(),
+                pet.getBirthDate(),
+                pet.getColor(),
+                speciesMapper.toDto(pet.getBreed().getSpecies()),
+                breedMapper.toDto(pet.getBreed()),
+                pet.getMicrochip() != null ? microchipMapper.toDto(pet.getMicrochip()) : null,
+                pet.getOwner() != null ? userMapper.toDto(pet.getOwner()) : null,
+                pictureDtos);
     }
 
     public Pet fromDto(
-        PetCreateDto dto,
-        Species species,
-        Breed breed,
-        Microchip microchip,
-        User owner
-    ) {
+            PetCreateDto dto,
+            Species species,
+            Breed breed,
+            Microchip microchip,
+            User owner) {
 
-        Pet pet = new Pet(
-            dto.name(),
-            dto.sex(),
-            dto.birthDate(),
-            dto.color(),
-            species,
-            breed,
-            microchip,
-            owner
-        );
-
-        if (dto.picture() != null) {
-            pet.setPicture(dto.picture());
-        }
-
-        return pet;
+        return new Pet(
+                dto.name(),
+                dto.sex(),
+                dto.birthDate(),
+                dto.color(),
+                species,
+                breed,
+                microchip,
+                owner);
     }
 
     public void update(
-        PetUpdateDto dto,
-        Pet pet,
-        Species species,
-        Breed breed,
-        Microchip microchip,
-        User owner
-    ) {
+            PetUpdateDto dto,
+            Pet pet,
+            Species species,
+            Breed breed,
+            Microchip microchip,
+            User owner) {
 
         if (dto.name() != null) {
             pet.setName(dto.name());
@@ -98,14 +98,6 @@ public class PetMapper {
             pet.setColor(dto.color());
         }
 
-        if (dto.picture() != null) {
-            pet.setPicture(dto.picture());
-        }
-
-        if (dto.speciesId() != null) {
-            pet.setSpecies(species);
-        }
-
         if (dto.breedId() != null) {
             pet.setBreed(breed);
         }
@@ -116,6 +108,14 @@ public class PetMapper {
 
         if (owner != null) {
             pet.setOwner(owner);
+        }
+
+        if (dto.picture() != null) {
+            Picture picture = new Picture();
+            picture.setPicture(dto.picture());
+            picture.setPet(pet);
+            picture.setFileName("uploaded_picture"); // Default name
+            pet.getPictures().add(picture);
         }
     }
 }
