@@ -3,6 +3,8 @@ package com.petreg.prototype.dto;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.petreg.prototype.model.type.PetStatus;
+
 public record PetResponseDto(
 
         Long id,
@@ -10,7 +12,7 @@ public record PetResponseDto(
         char sex,
         LocalDate birthDate,
         String color,
-        SpeciesResponseDto species,
+        PetStatus status,
         BreedResponseDto breed,
         MicrochipResponseDto microchip,
         UserResponseDto owner,

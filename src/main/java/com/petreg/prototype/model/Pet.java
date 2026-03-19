@@ -1,11 +1,19 @@
 package com.petreg.prototype.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.CreationTimestamp;
+
+import com.petreg.prototype.model.type.PetStatus;
+
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,10 +31,18 @@ public class Pet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
     private String name;
     private char sex;
     private LocalDate birthDate;
     private String color;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PetStatus status;
 
     @ManyToOne
     @JoinColumn(name = "breed_id")
@@ -51,7 +67,7 @@ public class Pet {
             char sex,
             LocalDate birthDate,
             String color,
-            Species species,
+            PetStatus status,
             Breed breed,
             Microchip microchip,
             User owner) {
@@ -59,6 +75,7 @@ public class Pet {
         this.sex = sex;
         this.birthDate = birthDate;
         this.color = color;
+        this.status = status;
         this.breed = breed;
         this.microchip = microchip;
         this.owner = owner;
@@ -66,6 +83,10 @@ public class Pet {
 
     public Long getId() {
         return id;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public String getName() {
@@ -98,6 +119,14 @@ public class Pet {
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public PetStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PetStatus status) {
+        this.status = status;
     }
 
     public List<Picture> getPictures() {

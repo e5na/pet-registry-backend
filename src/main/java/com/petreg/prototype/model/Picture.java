@@ -16,7 +16,7 @@ public class Picture {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "pet_id")
+    @JoinColumn(name = "pet_id", nullable = false)
     private Pet pet;
 
     private String fileName;
