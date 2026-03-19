@@ -47,10 +47,14 @@ public class UserMapper {
             dto.password(),
             OwnerProfileMapper.fromDto(dto.ownerProfile())
         );
-        // This back link is crucial
-        // Otherwise Hibernate will try to add a null User to the OwnerProfile which
-        // would trigger an IdentifierGenerationException
-        user.getOwnerProfile().setUser(user);
+
+        if (user.getOwnerProfile() != null) {
+            // This back link is crucial
+            // Otherwise Hibernate will try to add a null User to the OwnerProfile which
+            // would trigger an IdentifierGenerationException
+            user.getOwnerProfile().setUser(user);
+        }
+
         return user;
     }
 
