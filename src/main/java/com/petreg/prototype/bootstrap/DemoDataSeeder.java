@@ -40,6 +40,7 @@ public class DemoDataSeeder {
 
     private static final int NUM_OWNERS_TO_GENERATE = 25;
     private static final int MAX_PETS_PER_OWNER = 3;
+    private static final String DEFAULT_PASSWORD = "password";
 
     private static final Logger log = LoggerFactory.getLogger(DemoDataSeeder.class);
 
@@ -143,6 +144,14 @@ public class DemoDataSeeder {
             }
         }
 
+        // Log one OWNER for testing purposes
+        userRepository.findByRoles_Name(RoleEnum.OWNER)
+                .stream()
+                .findFirst()
+                .ifPresent(u -> log.info("DEMO: Log in as an OWNER with the credentials '{}:{}'",
+                        u.getPersonalCode(),
+                        DEFAULT_PASSWORD));
+
         log.info("Test data seeding complete");
     }
 
@@ -175,7 +184,7 @@ public class DemoDataSeeder {
         user.setPersonalCode(personalCode);
         user.setEmail(email);
         user.setPhoneNumber(faker.phoneNumber().cellPhone());
-        user.setPassword(passwordEncoder.encode("password"));
+        user.setPassword(passwordEncoder.encode(DEFAULT_PASSWORD));
         user.setRoles(Set.of(role));
 
         OwnerProfile profile = new OwnerProfile();
