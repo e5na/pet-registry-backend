@@ -23,6 +23,10 @@ public class SecurityConfiguration {
     SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
+            // No cookies, please
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
             .authorizeHttpRequests(auth -> auth
                 // Stop Spring Security re-triggering authentication on /error
                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
@@ -32,11 +36,7 @@ public class SecurityConfiguration {
                 .anyRequest().authenticated()
             )
             // Enable Basic Auth
-            .httpBasic(Customizer.withDefaults())
-            // No cookies, please
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            );
+            .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
