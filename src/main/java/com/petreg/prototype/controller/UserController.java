@@ -19,6 +19,8 @@ import com.petreg.prototype.dto.UserResponseDto;
 import com.petreg.prototype.dto.UserUpdateDto;
 import com.petreg.prototype.service.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -34,7 +36,7 @@ public class UserController {
     // Create
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponseDto create(@RequestBody UserCreateDto data) {
+    public UserResponseDto create(@Valid @RequestBody UserCreateDto data) {
         return userService.createUser(data);
     }
 
@@ -56,7 +58,7 @@ public class UserController {
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserResponseDto update(@PathVariable Long id,
-            @RequestBody UserUpdateDto data) {
+            @Valid @RequestBody UserUpdateDto data) {
         return userService.updateUser(id, data);
     }
 

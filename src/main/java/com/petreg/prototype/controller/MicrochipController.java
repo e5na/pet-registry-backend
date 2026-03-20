@@ -19,6 +19,8 @@ import com.petreg.prototype.dto.MicrochipResponseDto;
 import com.petreg.prototype.dto.MicrochipUpdateDto;
 import com.petreg.prototype.service.MicrochipService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/microchips")
 public class MicrochipController {
@@ -34,7 +36,7 @@ public class MicrochipController {
     // Create
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public MicrochipResponseDto create(@RequestBody MicrochipCreateDto data) {
+    public MicrochipResponseDto create(@Valid @RequestBody MicrochipCreateDto data) {
         return microchipService.createMicrochip(data);
     }
 
@@ -62,7 +64,7 @@ public class MicrochipController {
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public MicrochipResponseDto update(@PathVariable Long id,
-            @RequestBody MicrochipUpdateDto data) {
+            @Valid @RequestBody MicrochipUpdateDto data) {
         return microchipService.updateMicrochip(id, data);
     }
 
