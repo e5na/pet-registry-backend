@@ -2,9 +2,7 @@ package com.petreg.prototype.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -12,12 +10,19 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import jakarta.servlet.DispatcherType;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
+
+    private RoleValidationFilter roleValidationFilter;
+
+    public SecurityConfiguration(RoleValidationFilter roleValidationFilter) {
+        this.roleValidationFilter = roleValidationFilter;
+    }
 
     @Bean
     SecurityFilterChain configure(HttpSecurity http) throws Exception {
@@ -37,14 +42,14 @@ public class SecurityConfiguration {
                 .anyRequest().authenticated()
             )
             // Enable Basic Auth
-            .httpBasic(Customizer.withDefaults());
+            .httpBasic(Customizer.withDefaults())
+            // Validate active role
+            // Important! Must come AFTER BasicAuthenticationFilter has populated
+            // the SecurityContext, but BEFORE the request hits controllers
+            .addFilterAfter(roleValidationFilter,
+                            BasicAuthenticationFilter.class);
 
         return http.build();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
     }
 
     @Bean
