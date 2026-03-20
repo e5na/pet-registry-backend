@@ -22,8 +22,9 @@ public class SecurityConfiguration {
     @Bean
     SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http
+            // Stateless API, no CSRF needed
             .csrf(AbstractHttpConfigurer::disable)
-            // No cookies, please
+            // Ditto! So no cookies, please
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
