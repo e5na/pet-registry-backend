@@ -1,13 +1,13 @@
 package com.petreg.prototype.controller;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.petreg.prototype.dto.LoginRequestDto;
 import com.petreg.prototype.dto.UserCreateDto;
 import com.petreg.prototype.dto.UserResponseDto;
 import com.petreg.prototype.service.AuthService;
@@ -33,7 +33,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public UserResponseDto login(Authentication auth) {
-        return authService.login(auth);
+    public UserResponseDto login(@RequestBody LoginRequestDto data) {
+        return authService.login(data);
     }
 }
