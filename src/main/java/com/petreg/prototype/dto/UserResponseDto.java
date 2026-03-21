@@ -11,5 +11,6 @@ public record UserResponseDto(
     String phoneNumber,
     Set<RoleResponseDto> roles,
     // optional profiles
-    OwnerProfileResponseDto ownerProfile
+    OwnerProfileResponseDto ownerProfile,
+    VetProfileResponseDto vetProfile
 ) {}

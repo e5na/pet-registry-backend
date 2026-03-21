@@ -54,6 +54,9 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private OwnerProfile ownerProfile;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private VetProfile vetProfile;
+
     // --- Constructors ---
 
     public User() {}
@@ -69,7 +72,8 @@ public class User {
     }
 
     public User(String personalCode, String firstName, String lastName,
-            String email, String phoneNumber, String password, OwnerProfile ownerProfile) {
+            String email, String phoneNumber, String password, OwnerProfile ownerProfile,
+            VetProfile vetProfile) {
         this.personalCode = personalCode;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -77,6 +81,7 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.password = password;
         this.ownerProfile = ownerProfile;
+        this.vetProfile = vetProfile;
     }
 
     // --- Getters and setters ---
@@ -151,5 +156,13 @@ public class User {
 
     public void setOwnerProfile(OwnerProfile ownerProfile) {
         this.ownerProfile = ownerProfile;
+    }
+
+    public VetProfile getVetProfile() {
+        return vetProfile;
+    }
+
+    public void setVetProfile(VetProfile vetProfile) {
+        this.vetProfile = vetProfile;
     }
 }
