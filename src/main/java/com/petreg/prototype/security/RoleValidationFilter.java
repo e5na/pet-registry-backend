@@ -25,31 +25,39 @@ public class RoleValidationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain chain) throws ServletException, IOException {
 
-        String claimedRole = request.getHeader(ACTIVE_ROLE_HEADER);
-
-        // No header present - let Spring Security decide
-        if (claimedRole == null) {
-            chain.doFilter(request, response);
-            return;
-        }
-
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        boolean roleIsHeld = auth.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(a -> a.equals("ROLE_" + claimedRole.toUpperCase()));
+        if (auth != null && auth.isAuthenticated()) {
+            String claimedRole = request.getHeader(ACTIVE_ROLE_HEADER);
 
-        if (!roleIsHeld) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN,
-                    "User does not hold role: " + claimedRole);
-            return;
+            // The header is required
+            if (claimedRole == null) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                    ACTIVE_ROLE_HEADER + " is required");
+                return;
+            }
+
+            boolean roleIsHeld = auth.getAuthorities()
+                    .stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .anyMatch(a -> a.equals("ROLE_" + claimedRole.toUpperCase()));
+
+            if (!roleIsHeld) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN,
+                        "User does not hold role: " + claimedRole);
+                return;
+            }
+
+            // Role is valid — store it in the authentication details
+            // so the service layer can read it without touching the HTTP request
+            ((UsernamePasswordAuthenticationToken) auth).setDetails(claimedRole.toUpperCase());
         }
 
-        // Role is valid — store it in the authentication details
-        // so the service layer can read it without touching the HTTP request
-        ((UsernamePasswordAuthenticationToken) auth).setDetails(claimedRole.toUpperCase());
-
         chain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return request.getServletPath().equals("/api/auth/login");
     }
 }
