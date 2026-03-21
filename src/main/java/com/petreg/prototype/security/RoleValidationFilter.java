@@ -9,6 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.petreg.prototype.model.type.RoleEnum;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +20,12 @@ import jakarta.servlet.http.HttpServletResponse;
 public class RoleValidationFilter extends OncePerRequestFilter {
 
     private static final String ACTIVE_ROLE_HEADER = "X-Active-Role";
+
+    private final ActiveRoleContext activeRoleContext;
+
+    public RoleValidationFilter(ActiveRoleContext activeRoleContext) {
+        this.activeRoleContext = activeRoleContext;
+    }
 
     @Override
     protected void doFilterInternal(
@@ -48,9 +56,8 @@ public class RoleValidationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // Role is valid — store it in the authentication details
-            // so the service layer can read it without touching the HTTP request
-            ((UsernamePasswordAuthenticationToken) auth).setDetails(claimedRole.toUpperCase());
+            // Make the active role available to other Spring managed components
+            activeRoleContext.setActiveRole(RoleEnum.valueOf(claimedRole));
         }
 
         chain.doFilter(request, response);
