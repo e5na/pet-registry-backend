@@ -23,6 +23,7 @@ import com.petreg.prototype.model.Pet;
 import com.petreg.prototype.model.Role;
 import com.petreg.prototype.model.Species;
 import com.petreg.prototype.model.User;
+import com.petreg.prototype.model.VetProfile;
 import com.petreg.prototype.model.type.PetStatus;
 import com.petreg.prototype.model.type.RoleEnum;
 import com.petreg.prototype.repository.BreedRepository;
@@ -33,11 +34,13 @@ import com.petreg.prototype.repository.SpeciesRepository;
 import com.petreg.prototype.repository.UserRepository;
 
 import net.datafaker.Faker;
+import net.datafaker.providers.base.Text;
 
 @Component
 @ConditionalOnBooleanProperty(name = "prototype.demo.seed")
 public class DemoDataSeeder {
 
+    private static final int NUM_VETS_TO_GENERATE = 5;
     private static final int NUM_OWNERS_TO_GENERATE = 25;
     private static final int MAX_PETS_PER_OWNER = 3;
     private static final String DEFAULT_PASSWORD = "password";
@@ -144,11 +147,26 @@ public class DemoDataSeeder {
             }
         }
 
+        Role vetRole = roleRepository.findByName(RoleEnum.VET)
+                .orElseThrow(() -> new ResourceNotFoundException("VET role not found"));
+
+        for (int i = 0; i < NUM_VETS_TO_GENERATE; i++) {
+            User user = createFakeUser(vetRole);
+        }
+
         // Log one OWNER for testing purposes
         userRepository.findByRoles_Name(RoleEnum.OWNER)
                 .stream()
                 .findFirst()
                 .ifPresent(u -> log.info("DEMO: Log in as an OWNER with the credentials '{}:{}'",
+                        u.getPersonalCode(),
+                        DEFAULT_PASSWORD));
+
+        // Log one VET for testing purposes
+        userRepository.findByRoles_Name(RoleEnum.VET)
+                .stream()
+                .findFirst()
+                .ifPresent(u -> log.info("DEMO: Log in as a VET with the credentials '{}:{}'",
                         u.getPersonalCode(),
                         DEFAULT_PASSWORD));
 
@@ -187,10 +205,34 @@ public class DemoDataSeeder {
         user.setPassword(passwordEncoder.encode(DEFAULT_PASSWORD));
         user.setRoles(Set.of(role));
 
-        OwnerProfile profile = new OwnerProfile();
-        profile.setAddress(faker.address().fullAddress());
-        profile.setUser(user);
-        user.setOwnerProfile(profile);
+        switch (role.getName()) {
+            case RoleEnum.OWNER -> {
+                OwnerProfile profile = new OwnerProfile();
+                profile.setAddress(faker.address().fullAddress());
+                profile.setUser(user);
+                user.setOwnerProfile(profile);
+            }
+            case RoleEnum.VET -> {
+                VetProfile profile = new VetProfile();
+                String licenseNumber = faker.text().text(Text.TextSymbolsBuilder.builder()
+                        .len(4)
+                        .with("0123456789", 4)
+                        .build());
+                profile.setLicenseNumber(licenseNumber);
+                String[] specializations = {
+                    "Kirurgia",
+                    "Dermatoloogia",
+                    "Diagnostika",
+                    "Stomatoloogia"
+                };
+                profile.setSpecialization(faker.options().option(specializations));
+                profile.setUser(user);
+                user.setVetProfile(profile);
+            }
+            default -> {
+                throw new RuntimeException("Unknown role");
+            }
+        }
 
         return userRepository.save(user);
     }
