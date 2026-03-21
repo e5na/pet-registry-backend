@@ -10,4 +10,6 @@ public interface MicrochipRepository extends JpaRepository<Microchip, Long> {
 
     public List<Microchip> findByMicrochipNumberContainingIgnoreCase(String microchipNumber);
 
+    boolean existsByMicrochipNumber(String microchipNumber);
+
 }
