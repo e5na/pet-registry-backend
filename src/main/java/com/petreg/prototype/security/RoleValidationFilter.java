@@ -35,19 +35,21 @@ public class RoleValidationFilter extends OncePerRequestFilter {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null && auth.isAuthenticated()) {
-            String claimedRole = request.getHeader(ACTIVE_ROLE_HEADER);
+            String header = request.getHeader(ACTIVE_ROLE_HEADER);
 
             // The header is required
-            if (claimedRole == null) {
+            if (header == null) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST,
                     ACTIVE_ROLE_HEADER + " is required");
                 return;
             }
 
+            String claimedRole = header.toUpperCase();
+
             boolean roleIsHeld = auth.getAuthorities()
                     .stream()
                     .map(GrantedAuthority::getAuthority)
-                    .anyMatch(a -> a.equals("ROLE_" + claimedRole.toUpperCase()));
+                    .anyMatch(a -> a.equals("ROLE_" + claimedRole));
 
             if (!roleIsHeld) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN,
