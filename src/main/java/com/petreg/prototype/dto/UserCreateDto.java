@@ -9,11 +9,12 @@ public record UserCreateDto(
     String email,
     String phoneNumber,
     String password,
-    OwnerProfileCreateDto ownerProfile
+    OwnerProfileCreateDto ownerProfile,
+    VetProfileCreateDto vetProfile
 ) {
     @AssertTrue(message = "At least one profile must be selected")
     public boolean hasAtLeastOneProfile() {
         // Once more profiles get added, extend this with an OR check
-        return ownerProfile != null;
+        return ownerProfile != null || vetProfile != null;
     }
 }

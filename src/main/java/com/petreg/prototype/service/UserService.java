@@ -58,6 +58,10 @@ public class UserService {
             profileRoles.add(RoleEnum.OWNER);
         }
 
+        if (input.vetProfile() != null) {
+            profileRoles.add(RoleEnum.VET);
+        }
+
         profileRoles.forEach(profileRole -> {
             Role role = roleRepository.findByName(profileRole)
                 .orElseThrow(() -> new ResourceNotFoundException(
