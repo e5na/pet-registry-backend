@@ -50,6 +50,7 @@ public class DemoDataSeeder {
     private final Faker faker = new Faker(Locale.of("et", "EE"));
     private final Random random = new Random();
 
+    private final AdminSeeder adminSeeder;
     private final BreedRepository breedRepository;
     private final MicrochipRepository microchipRepository;
     private final PetRepository petRepository;
@@ -57,11 +58,11 @@ public class DemoDataSeeder {
     private final RoleSeeder roleSeeder;
     private final SpeciesRepository speciesRepository;
     private final UserRepository userRepository;
-
     private final JdbcTemplate jdbcTemplate;
     private final PasswordEncoder passwordEncoder;
 
     public DemoDataSeeder(
+            AdminSeeder adminSeeder,
             BreedRepository breedRepository,
             MicrochipRepository microchipRepository,
             PetRepository petRepository,
@@ -71,6 +72,7 @@ public class DemoDataSeeder {
             UserRepository userRepository,
             JdbcTemplate jdbcTemplate,
             PasswordEncoder passwordEncoder) {
+        this.adminSeeder = adminSeeder;
         this.breedRepository = breedRepository;
         this.microchipRepository = microchipRepository;
         this.petRepository = petRepository;
@@ -90,8 +92,11 @@ public class DemoDataSeeder {
         // Always clear everything before starting
         clearDatabase();
 
-        // We need roles again, since the db was wiped
+        // We need to re-create roles, since the db was wiped
         roleSeeder.createRoles();
+
+        // We need re-create admin, since the db was wiped
+        adminSeeder.createAdmin();
 
         // Ensure Species and some Breeds exist
         Species dog = createSpecies("Koer");
@@ -169,6 +174,14 @@ public class DemoDataSeeder {
                 .ifPresent(u -> log.info("DEMO: Log in as a VET with the credentials '{}:{}'",
                         u.getPersonalCode(),
                         DEFAULT_PASSWORD));
+
+        // Log one ADMIN for testing purposes
+        userRepository.findByRoles_Name(RoleEnum.ADMIN)
+                .stream()
+                .findFirst()
+                .ifPresent(u -> log.info("DEMO: Log in as an ADMIN with the credentials '{}:{}'",
+                        u.getPersonalCode(),
+                        adminSeeder.getDefaultAdminPassword()));
 
         log.info("Test data seeding complete");
     }
