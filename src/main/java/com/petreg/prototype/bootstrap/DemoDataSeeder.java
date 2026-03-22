@@ -42,6 +42,7 @@ public class DemoDataSeeder {
 
     private static final int NUM_VETS_TO_GENERATE = 5;
     private static final int NUM_OWNERS_TO_GENERATE = 25;
+    private static final int NUM_MULTI_TO_GENERATE = 1;
     private static final int MAX_PETS_PER_OWNER = 3;
     private static final String DEFAULT_PASSWORD = "password";
 
@@ -159,6 +160,11 @@ public class DemoDataSeeder {
             User user = createFakeUser(vetRole);
         }
 
+        // Seed multi-profile users
+        for (int i = 0; i < NUM_MULTI_TO_GENERATE; i++) {
+            User user = createFakeUser(vetRole, ownerRole);
+        }
+
         // Log one OWNER for testing purposes
         userRepository.findByRoles_Name(RoleEnum.OWNER)
                 .stream()
@@ -172,6 +178,15 @@ public class DemoDataSeeder {
                 .stream()
                 .findFirst()
                 .ifPresent(u -> log.info("DEMO: Log in as a VET with the credentials '{}:{}'",
+                        u.getPersonalCode(),
+                        DEFAULT_PASSWORD));
+
+        // Log one OWNER + VET for testing purposes
+        userRepository.findByRoles_Name(RoleEnum.VET)
+                .stream()
+                .filter(u -> u.getRoles().contains(ownerRole))
+                .findFirst()
+                .ifPresent(u -> log.info("DEMO: Log in as an OWNER+VET with the credentials '{}:{}'",
                         u.getPersonalCode(),
                         DEFAULT_PASSWORD));
 
@@ -194,7 +209,7 @@ public class DemoDataSeeder {
         return breedRepository.save(new Breed(name, species));
     }
 
-    private User createFakeUser(Role role) {
+    private User createFakeUser(Role... roles) {
         String personalCode = faker.idNumber().valid();
 
         while (userRepository.existsByPersonalCode(personalCode)) {
@@ -216,34 +231,36 @@ public class DemoDataSeeder {
         user.setEmail(email);
         user.setPhoneNumber(faker.phoneNumber().cellPhone());
         user.setPassword(passwordEncoder.encode(DEFAULT_PASSWORD));
-        user.setRoles(Set.of(role));
+        user.setRoles(Set.of(roles));
 
-        switch (role.getName()) {
-            case RoleEnum.OWNER -> {
-                OwnerProfile profile = new OwnerProfile();
-                profile.setAddress(faker.address().fullAddress());
-                profile.setUser(user);
-                user.setOwnerProfile(profile);
-            }
-            case RoleEnum.VET -> {
-                VetProfile profile = new VetProfile();
-                String licenseNumber = faker.text().text(Text.TextSymbolsBuilder.builder()
-                        .len(4)
-                        .with("0123456789", 4)
-                        .build());
-                profile.setLicenseNumber(licenseNumber);
-                String[] specializations = {
-                    "Kirurgia",
-                    "Dermatoloogia",
-                    "Diagnostika",
-                    "Stomatoloogia"
-                };
-                profile.setSpecialization(faker.options().option(specializations));
-                profile.setUser(user);
-                user.setVetProfile(profile);
-            }
-            default -> {
-                throw new RuntimeException("Unknown role");
+        for (Role role : roles) {
+            switch (role.getName()) {
+                case RoleEnum.OWNER -> {
+                    OwnerProfile profile = new OwnerProfile();
+                    profile.setAddress(faker.address().fullAddress());
+                    profile.setUser(user);
+                    user.setOwnerProfile(profile);
+                }
+                case RoleEnum.VET -> {
+                    VetProfile profile = new VetProfile();
+                    String licenseNumber = faker.text().text(Text.TextSymbolsBuilder.builder()
+                            .len(4)
+                            .with("0123456789", 4)
+                            .build());
+                    profile.setLicenseNumber(licenseNumber);
+                    String[] specializations = {
+                        "Kirurgia",
+                        "Dermatoloogia",
+                        "Diagnostika",
+                        "Stomatoloogia"
+                    };
+                    profile.setSpecialization(faker.options().option(specializations));
+                    profile.setUser(user);
+                    user.setVetProfile(profile);
+                }
+                default -> {
+                    throw new RuntimeException("Unknown role");
+                }
             }
         }
 
