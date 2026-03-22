@@ -21,6 +21,9 @@ import com.petreg.prototype.repository.UserRepository;
 @Component
 public class AdminSeeder {
 
+    // Lo and behold, the uncrackable password!
+    private static final String DEFAULT_PASSWORD = "admin123";
+
     private static final Logger log = LoggerFactory.getLogger(AdminSeeder.class);
 
     private final RoleRepository roleRepository;
@@ -60,8 +63,7 @@ public class AdminSeeder {
                     "USER",
                     "admin@localhost",
                     null,
-                    // Lo and behold, the uncrackable password!
-                    passwordEncoder.encode("admin123"));
+                    passwordEncoder.encode(DEFAULT_PASSWORD));
             admin.getRoles().add(role);
             userRepository.save(admin);
             String name = admin.getFirstName() + " " + admin.getLastName();
