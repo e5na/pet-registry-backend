@@ -73,4 +73,8 @@ public class AdminSeeder {
             log.info("Administrator account present");
         }
     }
+
+    public String getDefaultAdminPassword() {
+        return DEFAULT_PASSWORD;
+    }
 }
