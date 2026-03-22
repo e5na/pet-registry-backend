@@ -60,7 +60,7 @@ public class AdminSeeder {
                     "USER",
                     "admin@localhost",
                     null,
-                    // Behold the uncrackable password!
+                    // Lo and behold, the uncrackable password!
                     passwordEncoder.encode("admin123"));
             admin.getRoles().add(role);
             userRepository.save(admin);
