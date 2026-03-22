@@ -3,13 +3,15 @@ package com.petreg.prototype.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import com.petreg.prototype.dto.PetCreateDto;
+import com.petreg.prototype.dto.PetEventResponseDto;
 import com.petreg.prototype.dto.PetResponseDto;
 import com.petreg.prototype.dto.PetUpdateDto;
 import com.petreg.prototype.service.PetService;
+import com.petreg.prototype.service.PetEventService;
 
 import jakarta.validation.Valid;
 
@@ -18,16 +20,18 @@ import jakarta.validation.Valid;
 public class PetController {
 
     private final PetService petService;
+    private final PetEventService petEventService;
 
-    public PetController(PetService petService) {
+    public PetController(PetService petService, PetEventService petEventService) {
         this.petService = petService;
+        this.petEventService = petEventService;
     }
 
     // Create
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public PetResponseDto create(@Valid @RequestBody PetCreateDto data) {
-        return petService.createPet(data);
+    public PetResponseDto create(@Valid @RequestBody PetCreateDto data, Authentication authentication) {
+        return petService.createPet(data, authentication);
     }
 
     // Retrieve one
@@ -42,6 +46,13 @@ public class PetController {
     @ResponseStatus(HttpStatus.OK)
     public List<PetResponseDto> all() {
         return petService.getAllPets();
+    }
+
+    // Retrieve pet history
+    @GetMapping("/{id}/history")
+    @ResponseStatus(HttpStatus.OK)
+    public List<PetEventResponseDto> history(@PathVariable Long id) {
+        return petEventService.getPetHistory(id);
     }
 
     // Update
