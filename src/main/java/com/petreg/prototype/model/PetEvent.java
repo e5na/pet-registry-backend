@@ -2,8 +2,11 @@ package com.petreg.prototype.model;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.petreg.prototype.model.type.PetLifeCycleEvent;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -37,6 +40,8 @@ public class PetEvent {
     @Enumerated(EnumType.STRING)
     private PetLifeCycleEvent eventType;
 
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime timestamp;
 
     private String description;
@@ -48,14 +53,12 @@ public class PetEvent {
         User user,
         Role userRole,
         PetLifeCycleEvent eventType,
-        LocalDateTime timestamp,
         String description
     ) {
         this.pet = pet;
         this.user = user;
         this.userRole = userRole;
         this.eventType = eventType;
-        this.timestamp = timestamp;
         this.description = description;
     }
 

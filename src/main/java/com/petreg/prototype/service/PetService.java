@@ -2,6 +2,7 @@ package com.petreg.prototype.service;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.petreg.prototype.dto.PetCreateDto;
@@ -13,7 +14,9 @@ import com.petreg.prototype.mapper.PetMapper;
 import com.petreg.prototype.model.Breed;
 import com.petreg.prototype.model.Microchip;
 import com.petreg.prototype.model.Pet;
+import com.petreg.prototype.model.Role;
 import com.petreg.prototype.model.User;
+import com.petreg.prototype.model.type.PetLifeCycleEvent;
 import com.petreg.prototype.repository.BreedRepository;
 import com.petreg.prototype.repository.MicrochipRepository;
 import com.petreg.prototype.repository.PetRepository;
@@ -29,24 +32,30 @@ public class PetService {
     private final MicrochipRepository microchipRepository;
     private final UserRepository userRepository;
     private final PetMapper petMapper;
+    private final CurrentUserService currentUserService;
+    private final PetEventService petEventService;
 
     public PetService(
         PetRepository petRepository,
         BreedRepository breedRepository,
         MicrochipRepository microchipRepository,
         UserRepository userRepository,
-        PetMapper petMapper
+        PetMapper petMapper,
+        CurrentUserService currentUserService,
+        PetEventService petEventService
     ) {
         this.petRepository = petRepository;
         this.breedRepository = breedRepository;
         this.microchipRepository = microchipRepository;
         this.userRepository = userRepository;
         this.petMapper = petMapper;
+        this.currentUserService = currentUserService;
+        this.petEventService = petEventService;
     }
 
     // Create
     @Transactional
-    public PetResponseDto createPet(PetCreateDto dto) {
+    public PetResponseDto createPet(PetCreateDto dto, Authentication authentication) {
 
         Breed breed = breedRepository.findById(dto.breedId())
             .orElseThrow(() -> new ResourceNotFoundException(
@@ -77,7 +86,20 @@ public class PetService {
         }
 
         Pet pet = petMapper.fromDto(dto, breed, microchip, owner);
-        return petMapper.toDto(petRepository.save(pet));
+        Pet savedPet = petRepository.save(pet);
+
+        User currentUser = currentUserService.getAuthenticatedUser(authentication);
+        Role activeRole = currentUserService.getActiveRole(authentication);
+
+        petEventService.logEvent(
+            savedPet,
+            currentUser,
+            activeRole,
+            PetLifeCycleEvent.REGISTRATION,
+            null
+        );
+
+        return petMapper.toDto(savedPet);
     }
 
     // Retrieve all

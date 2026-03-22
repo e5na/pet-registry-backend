@@ -1,6 +1,5 @@
 package com.petreg.prototype.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -33,18 +32,17 @@ public class PetEventService {
     public PetEventResponseDto logEvent(
         Pet pet,
         User user,
-        Role userRole,
+        Role activeRole,
         PetLifeCycleEvent eventType,
         String description
     ) {
-        validateRoleForEvent(userRole, eventType);
+        validateRoleForEvent(activeRole, eventType);
 
         PetEvent event = new PetEvent(
             pet,
             user,
-            userRole,
+            activeRole,
             eventType,
-            LocalDateTime.now(),
             resolveDescription(eventType, description)
         );
 
