@@ -90,7 +90,7 @@ public class DemoDataSeeder {
         // Always clear everything before starting
         clearDatabase();
 
-        // We need roles again, since the db was wiped
+        // We need to re-create roles, since the db was wiped
         roleSeeder.createRoles();
 
         // Ensure Species and some Breeds exist
