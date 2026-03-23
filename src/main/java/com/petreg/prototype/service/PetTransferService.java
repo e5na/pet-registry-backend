@@ -2,6 +2,7 @@ package com.petreg.prototype.service;
 
 import java.time.LocalDateTime;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +14,9 @@ import com.petreg.prototype.exception.ForbiddenException;
 import com.petreg.prototype.exception.ResourceNotFoundException;
 import com.petreg.prototype.model.Pet;
 import com.petreg.prototype.model.PetTransfer;
+import com.petreg.prototype.model.Role;
 import com.petreg.prototype.model.User;
+import com.petreg.prototype.model.type.PetLifeCycleEvent;
 import com.petreg.prototype.model.type.TransferStatus;
 import com.petreg.prototype.repository.PetRepository;
 import com.petreg.prototype.repository.PetTransferRepository;
@@ -26,6 +29,8 @@ public class PetTransferService {
     private final PetRepository petRepository;
     private final PetTransferRepository transferRepository;
     private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
+    private final PetEventService petEventService;
 
     public PetTransferService(
             PetRepository petRepository,
@@ -36,11 +41,14 @@ public class PetTransferService {
         this.petRepository = petRepository;
         this.transferRepository = transferRepository;
         this.userRepository = userRepository;
+        this.currentUserService = currentUserService;
+        this.petEventService = petEventService;
     }
 
     public PetTransferResponseDto createTransfer(
             Long petId,
-            PetTransferCreateDto data) {
+            PetTransferCreateDto data,
+            Authentication auth) {
 
         // Load pet and verify current user is the owner
         Pet pet = petRepository.findById(petId)
@@ -80,10 +88,26 @@ public class PetTransferService {
 
         PetTransfer savedTransfer = transferRepository.save(transfer);
 
+        // Add event
+        User authUser = currentUserService.getAuthenticatedUser(auth);
+        Role activeRole = currentUserService.getActiveRole(auth);
+
+        petEventService.logEvent(
+            pet,
+            authUser,
+            activeRole,
+            PetLifeCycleEvent.OWNER_CHANGE_STARTED,
+            null
+        );
+
         return toDto(savedTransfer);
     }
 
-    public PetTransferResponseDto resolveTransfer(Long petId, Long id, boolean isAccepted) {
+    public PetTransferResponseDto resolveTransfer(
+            Long petId,
+            Long id,
+            boolean isAccepted,
+            Authentication auth) {
         // Load the PENDING transfer
         PetTransfer transfer = transferRepository.findByIdAndStatus(id, TransferStatus.PENDING)
             .orElseThrow(() -> new ResourceNotFoundException("Pending transfer request not found"));
@@ -102,9 +126,10 @@ public class PetTransferService {
                     "Only the target owner can accept or decline this request");
         }
 
+        Pet pet = transfer.getPet();
+
         if (isAccepted) {
             // Switch owners
-            Pet pet = transfer.getPet();
             pet.setOwner(transfer.getNewOwner());
 
             // pet is managed, so no explicit call to petRepository.save(pet) is needed
@@ -115,10 +140,25 @@ public class PetTransferService {
         }
 
         transfer.setConfirmedAt(LocalDateTime.now());
-        return toDto(transferRepository.save(transfer));
+
+        PetTransfer savedTransfer = transferRepository.save(transfer);
+
+        // Add event
+        User authUser = currentUserService.getAuthenticatedUser(auth);
+        Role activeRole = currentUserService.getActiveRole(auth);
+
+        petEventService.logEvent(
+            pet,
+            authUser,
+            activeRole,
+            PetLifeCycleEvent.OWNER_CHANGE_CONFIRMED,
+            null
+        );
+
+        return toDto(savedTransfer);
     }
 
-    public PetTransferResponseDto cancelTransfer(Long petId, Long id) {
+    public PetTransferResponseDto cancelTransfer(Long petId, Long id, Authentication auth) {
         PetTransfer transfer = transferRepository.findByIdAndStatus(id, TransferStatus.PENDING)
             .orElseThrow(() -> new ResourceNotFoundException("Pending transfer request not found"));
 
