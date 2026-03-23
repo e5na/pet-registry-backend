@@ -55,6 +55,19 @@ public class BreedService {
             .toList();
     }
 
+    // Retrieve all for species
+    public List<BreedResponseDto> getBreedsBySpecies(Long speciesId) {
+        speciesRepository.findById(speciesId)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Species with id " + speciesId + " not found"
+            ));
+
+        return breedRepository.findBySpecies_Id(speciesId)
+            .stream()
+            .map(breedMapper::toDto)
+            .toList();
+    }
+
     // Retrieve by ID
     public BreedResponseDto getBreed(Long id) {
 
