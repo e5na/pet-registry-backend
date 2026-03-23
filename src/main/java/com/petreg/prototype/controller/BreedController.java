@@ -39,7 +39,11 @@ public class BreedController {
     // Retrieve all
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
-    public List<BreedResponseDto> all() {
+    public List<BreedResponseDto> all(@RequestParam(required = false) Long speciesId) {
+        if (speciesId != null) {
+            return breedService.getBreedsBySpecies(speciesId);
+        }
+
         return breedService.getAllBreeds();
     }
 
