@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.petreg.prototype.dto.PetResponseDto;
 import com.petreg.prototype.dto.UserCreateDto;
 import com.petreg.prototype.dto.UserResponseDto;
 import com.petreg.prototype.dto.UserUpdateDto;
@@ -64,5 +65,12 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         userService.deleteUser(id);
+    }
+
+    // Retrieve pets
+    @GetMapping("/{id}/pets")
+    @ResponseStatus(HttpStatus.OK)
+    public List<PetResponseDto> getPets(@PathVariable Long id) {
+        return userService.getUserPets(id);
     }
 }

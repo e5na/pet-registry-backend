@@ -8,14 +8,17 @@ import java.util.stream.Collectors;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.petreg.prototype.dto.PetResponseDto;
 import com.petreg.prototype.dto.UserCreateDto;
 import com.petreg.prototype.dto.UserResponseDto;
 import com.petreg.prototype.dto.UserUpdateDto;
 import com.petreg.prototype.exception.ResourceNotFoundException;
+import com.petreg.prototype.mapper.PetMapper;
 import com.petreg.prototype.mapper.UserMapper;
 import com.petreg.prototype.model.Role;
 import com.petreg.prototype.model.User;
 import com.petreg.prototype.model.type.RoleEnum;
+import com.petreg.prototype.repository.PetRepository;
 import com.petreg.prototype.repository.RoleRepository;
 import com.petreg.prototype.repository.UserRepository;
 
@@ -24,15 +27,23 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PetRepository petRepository;
+    private final PetMapper petMapper;
 
     private final RoleRepository roleRepository;
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper,
-            RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserService(
+            UserRepository userRepository,
+            UserMapper userMapper,
+            RoleRepository roleRepository,
+            PasswordEncoder passwordEncoder,
+            PetRepository petRepository, PetMapper petMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.petRepository = petRepository;
+        this.petMapper = petMapper;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -115,5 +126,16 @@ public class UserService {
                 "User with personal code " + personalCode + " not found"
             ));
         return userMapper.toDto(user);
+    }
+
+    // Retrieve pets
+    public List<PetResponseDto> getUserPets(Long id) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "User with id " + id + " not found"
+            ));
+        return petRepository.findByOwnerId(id).stream()
+            .map(petMapper::toDto)
+            .collect(Collectors.toList());
     }
 }
