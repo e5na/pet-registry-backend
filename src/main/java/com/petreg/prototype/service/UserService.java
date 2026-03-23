@@ -12,6 +12,7 @@ import com.petreg.prototype.dto.PetResponseDto;
 import com.petreg.prototype.dto.UserCreateDto;
 import com.petreg.prototype.dto.UserResponseDto;
 import com.petreg.prototype.dto.UserUpdateDto;
+import com.petreg.prototype.exception.ConflictException;
 import com.petreg.prototype.exception.ResourceNotFoundException;
 import com.petreg.prototype.mapper.PetMapper;
 import com.petreg.prototype.mapper.UserMapper;
@@ -51,7 +52,7 @@ public class UserService {
     // Create
     public UserResponseDto createUser(UserCreateDto input) {
         if (userRepository.existsByPersonalCode(input.personalCode())) {
-            throw new RuntimeException(
+            throw new ConflictException(
                 "User already exists with personal code: " + input.personalCode()
             );
         }
@@ -122,7 +123,7 @@ public class UserService {
     // Retrieve by personal code
     public UserResponseDto getUserByPersonalCode(String personalCode) {
         User user = userRepository.findByPersonalCode(personalCode)
-            .orElseThrow(() -> new RuntimeException(
+            .orElseThrow(() -> new ResourceNotFoundException(
                 "User with personal code " + personalCode + " not found"
             ));
         return userMapper.toDto(user);
