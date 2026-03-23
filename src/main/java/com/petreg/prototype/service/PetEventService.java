@@ -85,6 +85,12 @@ public class PetEventService {
                     throw new BadRequestException("Only a shelter worker or admin can mark a pet as found");
                 }
             }
+            // This should be a shelter worker job, but without shelter tables, I will put VET here for now
+            case RETURNED_TO_OWNER -> {
+                if (roleName != RoleEnum.ADMIN && roleName != RoleEnum.VET) {
+                    throw new BadRequestException("This role cannot mark a pet as returned to owner");
+                }
+            }
             case MEDICAL_CHECKUP, TREATMENT_RECORDED -> {
                 if (roleName != RoleEnum.VET) {
                     throw new BadRequestException("Only a veterinarian can record this event");
@@ -114,6 +120,7 @@ public class PetEventService {
             case OWNER_CHANGE_CONFIRMED -> "Owner change confirmed";
             case LOST_REPORTED -> "Pet reported lost";
             case FOUND_IN_SHELTER -> "Pet found in shelter";
+            case RETURNED_TO_OWNER -> "Pet returned to owner";  
             case MEDICAL_CHECKUP -> "Medical checkup recorded";
             case TREATMENT_RECORDED -> "Treatment recorded";
             case DEATH_REPORTED -> "Death reported";

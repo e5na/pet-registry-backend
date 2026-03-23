@@ -15,6 +15,7 @@ import com.petreg.prototype.model.Microchip;
 import com.petreg.prototype.model.Pet;
 import com.petreg.prototype.model.Picture;
 import com.petreg.prototype.model.User;
+import com.petreg.prototype.model.type.PetStatus;
 
 @Component
 public class PetMapper {
@@ -63,7 +64,7 @@ public class PetMapper {
                 dto.sex(),
                 dto.birthDate(),
                 dto.color(),
-                dto.status(),
+                PetStatus.ACTIVE,
                 breed,
                 microchip,
                 owner);
