@@ -2,6 +2,7 @@ package com.petreg.prototype.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,7 +35,7 @@ public class PetTransferController {
     }
 
     // Accept
-    @PostMapping("/{petId}/transfers/{id}/accept")
+    @PatchMapping("/{petId}/transfers/{id}/accept")
     @ResponseStatus(HttpStatus.OK)
     public PetTransferResponseDto accept(
             @PathVariable Long petId,
@@ -44,7 +45,7 @@ public class PetTransferController {
     }
 
     // Decline
-    @PostMapping("/{petId}/transfers/{id}/decline")
+    @PatchMapping("/{petId}/transfers/{id}/decline")
     @ResponseStatus(HttpStatus.OK)
     public PetTransferResponseDto decline(
             @PathVariable Long petId,
@@ -54,7 +55,7 @@ public class PetTransferController {
     }
 
     // Cancel
-    @PostMapping("/{petId}/transfers/{id}/cancel")
+    @PatchMapping("/{petId}/transfers/{id}/cancel")
     @ResponseStatus(HttpStatus.OK)
     public void cancel(
             @PathVariable Long petId,
