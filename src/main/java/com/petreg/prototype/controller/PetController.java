@@ -65,6 +65,41 @@ public class PetController {
         return petService.updatePet(id, data);
     }
 
+    // Report lost pet
+    @PatchMapping("/{id}/report-lost")
+    @ResponseStatus(HttpStatus.OK)
+    public PetResponseDto reportLost(@PathVariable Long id, Authentication authentication) {
+        return petService.reportLost(id, null, authentication);
+    }
+
+    // Report found pet
+    @PatchMapping("/{id}/mark-found")
+    @ResponseStatus(HttpStatus.OK)
+    public PetResponseDto markFound(@PathVariable Long id, Authentication authentication) {
+        return petService.markFoundInShelter(id, null, authentication);
+    }
+
+    // Return pet to owner
+    @PatchMapping("/{id}/return-to-owner")
+    @ResponseStatus(HttpStatus.OK)
+    public PetResponseDto returnToOwner(@PathVariable Long id, Authentication authentication) {
+        return petService.markReturnedToOwner(id, null, authentication);
+    }
+
+    // Report death of pet
+    @PatchMapping("/{id}/report-death")
+    @ResponseStatus(HttpStatus.OK)
+    public PetResponseDto reportDeath(@PathVariable Long id, Authentication authentication) {
+        return petService.reportDeath(id, null, authentication);
+    }
+
+    // Report permanent export of pet
+    @PatchMapping("/{id}/export")
+    @ResponseStatus(HttpStatus.OK)
+    public PetResponseDto exportPet(@PathVariable Long id, Authentication authentication) {
+        return petService.recordPermanentExport(id, null, authentication);
+    }
+
     // Delete
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

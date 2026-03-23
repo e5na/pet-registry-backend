@@ -9,6 +9,7 @@ import com.petreg.prototype.dto.PetCreateDto;
 import com.petreg.prototype.dto.PetResponseDto;
 import com.petreg.prototype.dto.PetUpdateDto;
 import com.petreg.prototype.exception.ResourceNotFoundException;
+import com.petreg.prototype.exception.BadRequestException;
 import com.petreg.prototype.exception.ConflictException;
 import com.petreg.prototype.mapper.PetMapper;
 import com.petreg.prototype.model.Breed;
@@ -17,6 +18,7 @@ import com.petreg.prototype.model.Pet;
 import com.petreg.prototype.model.Role;
 import com.petreg.prototype.model.User;
 import com.petreg.prototype.model.type.PetLifeCycleEvent;
+import com.petreg.prototype.model.type.PetStatus;
 import com.petreg.prototype.repository.BreedRepository;
 import com.petreg.prototype.repository.MicrochipRepository;
 import com.petreg.prototype.repository.PetRepository;
@@ -170,6 +172,183 @@ public class PetService {
 
         petMapper.update(dto, pet, breed, microchip, owner);
         return petMapper.toDto(petRepository.save(pet));
+    }
+
+    // Report lost pet
+    @Transactional
+    public PetResponseDto reportLost(Long id, String description, Authentication authentication) {
+        Pet pet = petRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Pet with id " + id + " not found"
+            ));
+
+        if (pet.getStatus() == PetStatus.DECEASED) {
+            throw new BadRequestException("A deceased pet cannot be reported as lost");
+        }
+
+        if (pet.getStatus() == PetStatus.EXPORTED) {
+            throw new BadRequestException("An exported pet cannot be reported as lost");
+        }
+
+        if (pet.getStatus() == PetStatus.LOST) {
+            throw new BadRequestException("Pet is already marked as lost");
+        }
+
+        User currentUser = currentUserService.getAuthenticatedUser(authentication);
+        Role activeRole = currentUserService.getActiveRole(authentication);
+
+        pet.setStatus(PetStatus.LOST);
+        Pet savedPet = petRepository.save(pet);
+
+        petEventService.logEvent(
+            savedPet,
+            currentUser,
+            activeRole,
+            PetLifeCycleEvent.LOST_REPORTED,
+            description
+        );
+
+        return petMapper.toDto(savedPet);
+    }
+
+    // Report found pet
+    @Transactional
+    public PetResponseDto markFoundInShelter(Long id, String description, Authentication authentication) {
+        Pet pet = petRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Pet with id " + id + " not found"
+            ));
+
+        if (pet.getStatus() == PetStatus.DECEASED) {
+            throw new BadRequestException("A deceased pet cannot be marked as found");
+        }
+
+        if (pet.getStatus() == PetStatus.EXPORTED) {
+            throw new BadRequestException("An exported pet cannot be marked as found");
+        }
+
+        if (pet.getStatus() != PetStatus.LOST) {
+            throw new BadRequestException("Only a lost pet can be marked as found in shelter");
+        }
+
+        User currentUser = currentUserService.getAuthenticatedUser(authentication);
+        Role activeRole = currentUserService.getActiveRole(authentication);
+
+        pet.setStatus(PetStatus.FOUND);
+        Pet savedPet = petRepository.save(pet);
+
+        petEventService.logEvent(
+            savedPet,
+            currentUser,
+            activeRole,
+            PetLifeCycleEvent.FOUND_IN_SHELTER,
+            description
+        );
+
+        return petMapper.toDto(savedPet);
+    }
+
+    // Return pet to owner
+    @Transactional
+    public PetResponseDto markReturnedToOwner(Long id, String description, Authentication authentication) {
+        Pet pet = petRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Pet with id " + id + " not found"
+            ));
+
+        if (pet.getStatus() == PetStatus.DECEASED) {
+            throw new BadRequestException("A deceased pet cannot be returned to owner");
+        }
+
+        if (pet.getStatus() == PetStatus.EXPORTED) {
+            throw new BadRequestException("An exported pet cannot be returned to owner");
+        }
+
+        if (pet.getStatus() != PetStatus.FOUND && pet.getStatus() != PetStatus.LOST) {
+            throw new BadRequestException("Only a lost or found pet can be returned to owner");
+        }
+
+        User currentUser = currentUserService.getAuthenticatedUser(authentication);
+        Role activeRole = currentUserService.getActiveRole(authentication);
+
+        pet.setStatus(PetStatus.ACTIVE);
+        Pet savedPet = petRepository.save(pet);
+
+        petEventService.logEvent(
+            savedPet,
+            currentUser,
+            activeRole,
+            PetLifeCycleEvent.RETURNED_TO_OWNER,
+            description
+        );
+
+        return petMapper.toDto(savedPet);
+    }
+
+    // Report death of pet
+    @Transactional
+    public PetResponseDto reportDeath(Long id, String description, Authentication authentication) {
+        Pet pet = petRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Pet with id " + id + " not found"
+            ));
+
+        if (pet.getStatus() == PetStatus.DECEASED) {
+            throw new BadRequestException("Pet is already marked as deceased");
+        }
+
+        if (pet.getStatus() == PetStatus.EXPORTED) {
+            throw new BadRequestException("An exported pet cannot be marked as deceased");
+        }
+
+        User currentUser = currentUserService.getAuthenticatedUser(authentication);
+        Role activeRole = currentUserService.getActiveRole(authentication);
+
+        pet.setStatus(PetStatus.DECEASED);
+        Pet savedPet = petRepository.save(pet);
+
+        petEventService.logEvent(
+            savedPet,
+            currentUser,
+            activeRole,
+            PetLifeCycleEvent.DEATH_REPORTED,
+            description
+        );
+
+        return petMapper.toDto(savedPet);
+    }
+
+    // Report permanent export of pet
+    @Transactional
+    public PetResponseDto recordPermanentExport(Long id, String description, Authentication authentication) {
+        Pet pet = petRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Pet with id " + id + " not found"
+            ));
+
+        if (pet.getStatus() == PetStatus.DECEASED) {
+            throw new BadRequestException("A deceased pet cannot be permanently exported");
+        }
+
+        if (pet.getStatus() == PetStatus.EXPORTED) {
+            throw new BadRequestException("Pet is already marked as exported");
+        }
+
+        User currentUser = currentUserService.getAuthenticatedUser(authentication);
+        Role activeRole = currentUserService.getActiveRole(authentication);
+
+        pet.setStatus(PetStatus.EXPORTED);
+        Pet savedPet = petRepository.save(pet);
+
+        petEventService.logEvent(
+            savedPet,
+            currentUser,
+            activeRole,
+            PetLifeCycleEvent.PERMANENT_EXPORT,
+            description
+        );
+
+        return petMapper.toDto(savedPet);
     }
 
     // Delete
