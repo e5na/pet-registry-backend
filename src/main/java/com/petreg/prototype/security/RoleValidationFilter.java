@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.petreg.prototype.model.type.RoleEnum;
+import com.petreg.prototype.repository.UserRepository;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,10 +21,14 @@ public class RoleValidationFilter extends OncePerRequestFilter {
 
     private static final String ACTIVE_ROLE_HEADER = "X-Active-Role";
 
-    private final ActiveRoleContext activeRoleContext;
+    private final ActiveUserContext activeUserContext;
+    private final UserRepository userRepository;
 
-    public RoleValidationFilter(ActiveRoleContext activeRoleContext) {
-        this.activeRoleContext = activeRoleContext;
+    public RoleValidationFilter(
+            ActiveUserContext activeUserContext,
+            UserRepository userRepository) {
+        this.activeUserContext = activeUserContext;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -57,8 +62,10 @@ public class RoleValidationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // Make the active role available to other Spring managed components
-            activeRoleContext.setActiveRole(RoleEnum.valueOf(claimedRole));
+            // Make the active user available to other Spring managed components
+            // TODO: fix redundant second call to the db to get the user entity
+            userRepository.findByPersonalCodeWithRoles(auth.getName()).ifPresent(activeUserContext::setUser);
+            activeUserContext.setActiveRoleType(RoleEnum.valueOf(claimedRole));
         }
 
         chain.doFilter(request, response);

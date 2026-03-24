@@ -14,34 +14,34 @@ import com.petreg.prototype.exception.ForbiddenException;
 import com.petreg.prototype.exception.ResourceNotFoundException;
 import com.petreg.prototype.model.Pet;
 import com.petreg.prototype.model.PetTransfer;
-import com.petreg.prototype.model.Role;
 import com.petreg.prototype.model.User;
 import com.petreg.prototype.model.type.PetLifeCycleEvent;
 import com.petreg.prototype.model.type.TransferStatus;
 import com.petreg.prototype.repository.PetRepository;
 import com.petreg.prototype.repository.PetTransferRepository;
 import com.petreg.prototype.repository.UserRepository;
+import com.petreg.prototype.security.ActiveUserContext;
 
 @Service
 @Transactional
 public class PetTransferService {
 
+    private final ActiveUserContext activeUserContext;
+    private final PetEventService petEventService;
     private final PetRepository petRepository;
     private final PetTransferRepository transferRepository;
     private final UserRepository userRepository;
-    private final CurrentUserService currentUserService;
-    private final PetEventService petEventService;
 
     public PetTransferService(
+            ActiveUserContext activeUserContext,
             PetRepository petRepository,
             PetTransferRepository transferRepository,
             UserRepository userRepository,
-            CurrentUserService currentUserService,
             PetEventService petEventService) {
+        this.activeUserContext = activeUserContext;
         this.petRepository = petRepository;
         this.transferRepository = transferRepository;
         this.userRepository = userRepository;
-        this.currentUserService = currentUserService;
         this.petEventService = petEventService;
     }
 
@@ -131,13 +131,10 @@ public class PetTransferService {
 
         if (isAccepted) {
             // Add event
-            User authUser = currentUserService.getAuthenticatedUser(auth);
-            Role activeRole = currentUserService.getActiveRole(auth);
-
             petEventService.logEvent(
                 pet,
-                authUser,
-                activeRole,
+                activeUserContext.getUser(),
+                activeUserContext.getActiveRoleType(),
                 PetLifeCycleEvent.OWNER_CHANGED,
                 null
             );

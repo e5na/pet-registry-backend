@@ -15,7 +15,6 @@ import com.petreg.prototype.mapper.PetMapper;
 import com.petreg.prototype.model.Breed;
 import com.petreg.prototype.model.Microchip;
 import com.petreg.prototype.model.Pet;
-import com.petreg.prototype.model.Role;
 import com.petreg.prototype.model.User;
 import com.petreg.prototype.model.type.PetLifeCycleEvent;
 import com.petreg.prototype.model.type.PetStatus;
@@ -23,6 +22,7 @@ import com.petreg.prototype.repository.BreedRepository;
 import com.petreg.prototype.repository.MicrochipRepository;
 import com.petreg.prototype.repository.PetRepository;
 import com.petreg.prototype.repository.UserRepository;
+import com.petreg.prototype.security.ActiveUserContext;
 
 import jakarta.transaction.Transactional;
 
@@ -34,25 +34,24 @@ public class PetService {
     private final MicrochipRepository microchipRepository;
     private final UserRepository userRepository;
     private final PetMapper petMapper;
-    private final CurrentUserService currentUserService;
     private final PetEventService petEventService;
+    private final ActiveUserContext activeUserContext;
 
     public PetService(
-        PetRepository petRepository,
-        BreedRepository breedRepository,
-        MicrochipRepository microchipRepository,
-        UserRepository userRepository,
-        PetMapper petMapper,
-        CurrentUserService currentUserService,
-        PetEventService petEventService
-    ) {
+            PetRepository petRepository,
+            BreedRepository breedRepository,
+            MicrochipRepository microchipRepository,
+            UserRepository userRepository,
+            PetMapper petMapper,
+            PetEventService petEventService,
+            ActiveUserContext activeUserContext) {
         this.petRepository = petRepository;
         this.breedRepository = breedRepository;
         this.microchipRepository = microchipRepository;
         this.userRepository = userRepository;
         this.petMapper = petMapper;
-        this.currentUserService = currentUserService;
         this.petEventService = petEventService;
+        this.activeUserContext = activeUserContext;
     }
 
     // Create
@@ -90,13 +89,10 @@ public class PetService {
         Pet pet = petMapper.fromDto(dto, breed, microchip, owner);
         Pet savedPet = petRepository.save(pet);
 
-        User currentUser = currentUserService.getAuthenticatedUser(authentication);
-        Role activeRole = currentUserService.getActiveRole(authentication);
-
         petEventService.logEvent(
             savedPet,
-            currentUser,
-            activeRole,
+            activeUserContext.getUser(),
+            activeUserContext.getActiveRoleType(),
             PetLifeCycleEvent.REGISTRATION,
             null
         );
@@ -194,16 +190,13 @@ public class PetService {
             throw new BadRequestException("Pet is already marked as lost");
         }
 
-        User currentUser = currentUserService.getAuthenticatedUser(authentication);
-        Role activeRole = currentUserService.getActiveRole(authentication);
-
         pet.setStatus(PetStatus.LOST);
         Pet savedPet = petRepository.save(pet);
 
         petEventService.logEvent(
             savedPet,
-            currentUser,
-            activeRole,
+            activeUserContext.getUser(),
+            activeUserContext.getActiveRoleType(),
             PetLifeCycleEvent.LOST_REPORTED,
             description
         );
@@ -231,16 +224,13 @@ public class PetService {
             throw new BadRequestException("Only a lost pet can be marked as found in shelter");
         }
 
-        User currentUser = currentUserService.getAuthenticatedUser(authentication);
-        Role activeRole = currentUserService.getActiveRole(authentication);
-
         pet.setStatus(PetStatus.FOUND);
         Pet savedPet = petRepository.save(pet);
 
         petEventService.logEvent(
             savedPet,
-            currentUser,
-            activeRole,
+            activeUserContext.getUser(),
+            activeUserContext.getActiveRoleType(),
             PetLifeCycleEvent.FOUND_IN_SHELTER,
             description
         );
@@ -268,16 +258,13 @@ public class PetService {
             throw new BadRequestException("Only a lost or found pet can be returned to owner");
         }
 
-        User currentUser = currentUserService.getAuthenticatedUser(authentication);
-        Role activeRole = currentUserService.getActiveRole(authentication);
-
         pet.setStatus(PetStatus.ACTIVE);
         Pet savedPet = petRepository.save(pet);
 
         petEventService.logEvent(
             savedPet,
-            currentUser,
-            activeRole,
+            activeUserContext.getUser(),
+            activeUserContext.getActiveRoleType(),
             PetLifeCycleEvent.RETURNED_TO_OWNER,
             description
         );
@@ -301,16 +288,13 @@ public class PetService {
             throw new BadRequestException("An exported pet cannot be marked as deceased");
         }
 
-        User currentUser = currentUserService.getAuthenticatedUser(authentication);
-        Role activeRole = currentUserService.getActiveRole(authentication);
-
         pet.setStatus(PetStatus.DECEASED);
         Pet savedPet = petRepository.save(pet);
 
         petEventService.logEvent(
             savedPet,
-            currentUser,
-            activeRole,
+            activeUserContext.getUser(),
+            activeUserContext.getActiveRoleType(),
             PetLifeCycleEvent.DEATH_REPORTED,
             description
         );
@@ -334,16 +318,13 @@ public class PetService {
             throw new BadRequestException("Pet is already marked as exported");
         }
 
-        User currentUser = currentUserService.getAuthenticatedUser(authentication);
-        Role activeRole = currentUserService.getActiveRole(authentication);
-
         pet.setStatus(PetStatus.EXPORTED);
         Pet savedPet = petRepository.save(pet);
 
         petEventService.logEvent(
             savedPet,
-            currentUser,
-            activeRole,
+            activeUserContext.getUser(),
+            activeUserContext.getActiveRoleType(),
             PetLifeCycleEvent.PERMANENT_EXPORT,
             description
         );
