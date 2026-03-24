@@ -86,21 +86,7 @@ public class PetTransferService {
         transfer.setNewOwner(newOwner);
         transfer.setStatus(TransferStatus.PENDING);
 
-        PetTransfer savedTransfer = transferRepository.save(transfer);
-
-        // Add event
-        User authUser = currentUserService.getAuthenticatedUser(auth);
-        Role activeRole = currentUserService.getActiveRole(auth);
-
-        petEventService.logEvent(
-            pet,
-            authUser,
-            activeRole,
-            PetLifeCycleEvent.OWNER_CHANGE_STARTED,
-            null
-        );
-
-        return toDto(savedTransfer);
+        return toDto(transferRepository.save(transfer));
     }
 
     public PetTransferResponseDto resolveTransfer(
@@ -143,17 +129,19 @@ public class PetTransferService {
 
         PetTransfer savedTransfer = transferRepository.save(transfer);
 
-        // Add event
-        User authUser = currentUserService.getAuthenticatedUser(auth);
-        Role activeRole = currentUserService.getActiveRole(auth);
+        if (isAccepted) {
+            // Add event
+            User authUser = currentUserService.getAuthenticatedUser(auth);
+            Role activeRole = currentUserService.getActiveRole(auth);
 
-        petEventService.logEvent(
-            pet,
-            authUser,
-            activeRole,
-            PetLifeCycleEvent.OWNER_CHANGE_CONFIRMED,
-            null
-        );
+            petEventService.logEvent(
+                pet,
+                authUser,
+                activeRole,
+                PetLifeCycleEvent.OWNER_CHANGED,
+                null
+            );
+        }
 
         return toDto(savedTransfer);
     }

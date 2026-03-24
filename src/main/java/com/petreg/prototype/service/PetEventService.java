@@ -64,12 +64,7 @@ public class PetEventService {
                     throw new BadRequestException("Only an admin or veterinarian can register a pet");
                 }
             }
-            case OWNER_CHANGE_STARTED -> {
-                if (roleName != RoleEnum.OWNER) {
-                    throw new BadRequestException("Only an owner can start an owner change");
-                }
-            }
-            case OWNER_CHANGE_CONFIRMED -> {
+            case OWNER_CHANGED -> {
                 if (roleName != RoleEnum.OWNER) {
                     throw new BadRequestException("Only an owner can confirm an owner change");
                 }
@@ -116,8 +111,7 @@ public class PetEventService {
 
         return switch (eventType) {
             case REGISTRATION -> "Pet registered";
-            case OWNER_CHANGE_STARTED -> "Owner change started";
-            case OWNER_CHANGE_CONFIRMED -> "Owner change confirmed";
+            case OWNER_CHANGED -> "Owner changed";
             case LOST_REPORTED -> "Pet reported lost";
             case FOUND_IN_SHELTER -> "Pet found in shelter";
             case RETURNED_TO_OWNER -> "Pet returned to owner";  

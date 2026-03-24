@@ -2,8 +2,7 @@ package com.petreg.prototype.model.type;
 
 public enum PetLifeCycleEvent {
     REGISTRATION,
-    OWNER_CHANGE_STARTED,
-    OWNER_CHANGE_CONFIRMED,
+    OWNER_CHANGED,
     LOST_REPORTED,
     FOUND_IN_SHELTER,
     RETURNED_TO_OWNER,
