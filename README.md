@@ -39,6 +39,10 @@ Dedicated API endpoints exist for the following operations.
 
 - Uses **HTTP Basic Authentication** (username:password), the username is the user's personal identification code
 - Every request must include: X-Active-Role: ROLE_NAME (currently supported roles: OWNER, VET, ADMIN)
+- If a user has multiple roles they can swap between the different views on the registry site
+    - OWNER users can only see pets that belong to them, plus they can mark them deceased or lost.
+    - VET users can register pets, register new microchips and check the list of all pets
+    - ADMIN users can register new microchips, register new breeds (currently not implemented), manage users (currenly not implemented)
 
 ### Notes:
 
@@ -52,6 +56,9 @@ Dedicated API endpoints exist for the following operations.
 - Schema is managed via **Flyway migrations**
 
 Migration files are located in: `src/main/resources/db/migration`
+
+Graph for the database tables and their connections (the shelter and veterinary+treatment ones still require implementation)
+![Database Schema Image](db_schema.png)
 ## Setup
 
 ### Prerequisites
@@ -60,7 +67,6 @@ Migration files are located in: `src/main/resources/db/migration`
 - PostgreSQL (14+ recommended)
 - Maven (or use the included wrapper `mvnw`/`mvnw.cmd`)
 - Node.js
-- Postman (optional, to run tests)
 
 ### Installation
 
