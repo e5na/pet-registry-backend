@@ -3,6 +3,7 @@ package com.petreg.prototype.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -35,6 +36,7 @@ public class RoleController {
     // Create
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public RoleResponseDto create(@Valid @RequestBody RoleCreateDto data) {
         return roleService.createRole(data);
     }
@@ -42,6 +44,7 @@ public class RoleController {
     // Retrieve
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("isAuthenticated()")
     public RoleResponseDto one(@PathVariable Long id) {
         return roleService.getRole(id);
     }
@@ -49,6 +52,7 @@ public class RoleController {
     // Retrieve all
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("isAuthenticated()")
     public List<RoleResponseDto> all() {
         return roleService.getAllRoles();
     }
@@ -56,6 +60,7 @@ public class RoleController {
     // Update
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
     public RoleResponseDto update(@PathVariable Long id,
             @Valid @RequestBody RoleUpdateDto data) {
         return roleService.updateRole(id, data);
@@ -64,6 +69,7 @@ public class RoleController {
     // Delete
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable Long id) {
         roleService.deleteRole(id);
     }

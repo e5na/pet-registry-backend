@@ -1,6 +1,7 @@
 package com.petreg.prototype.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/pets")
+@PreAuthorize("hasAnyRole('OWNER', 'ADMIN')")
 public class PetTransferController {
 
     private PetTransferService transferService;

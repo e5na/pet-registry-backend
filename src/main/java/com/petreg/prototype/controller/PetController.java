@@ -3,6 +3,7 @@ package com.petreg.prototype.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.petreg.prototype.dto.PetCreateDto;
@@ -29,6 +30,7 @@ public class PetController {
     // Create
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('VET', 'ADMIN')")
     public PetResponseDto create(@Valid @RequestBody PetCreateDto data) {
         return petService.createPet(data);
     }
@@ -36,6 +38,7 @@ public class PetController {
     // Retrieve one
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('OWNER', 'VET', 'ADMIN')")
     public PetResponseDto one(@PathVariable Long id) {
         return petService.getPet(id);
     }
@@ -43,6 +46,7 @@ public class PetController {
     // Retrieve all
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('VET', 'ADMIN')")
     public List<PetResponseDto> all() {
         return petService.getAllPets();
     }
@@ -50,6 +54,7 @@ public class PetController {
     // Retrieve pet history
     @GetMapping("/{id}/history")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('OWNER', 'VET', 'ADMIN')")
     public List<PetEventResponseDto> history(@PathVariable Long id) {
         return petEventService.getPetHistory(id);
     }
@@ -57,6 +62,7 @@ public class PetController {
     // Update
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('OWNER', 'VET', 'ADMIN')")
     public PetResponseDto update(
             @PathVariable Long id,
             @Valid @RequestBody PetUpdateDto data) {
@@ -67,6 +73,7 @@ public class PetController {
     // Report lost pet
     @PatchMapping("/{id}/report-lost")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('OWNER')")
     public PetResponseDto reportLost(@PathVariable Long id) {
         return petService.reportLost(id, null);
     }
@@ -74,6 +81,7 @@ public class PetController {
     // Report found pet
     @PatchMapping("/{id}/mark-found")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('SHELTER', 'ADMIN')")
     public PetResponseDto markFound(@PathVariable Long id) {
         return petService.markFoundInShelter(id, null);
     }
@@ -81,6 +89,7 @@ public class PetController {
     // Return pet to owner
     @PatchMapping("/{id}/return-to-owner")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('SHELTER', 'ADMIN')")
     public PetResponseDto returnToOwner(@PathVariable Long id) {
         return petService.markReturnedToOwner(id, null);
     }
@@ -88,6 +97,7 @@ public class PetController {
     // Report death of pet
     @PatchMapping("/{id}/report-death")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('OWNER', 'VET', 'ADMIN')")
     public PetResponseDto reportDeath(@PathVariable Long id) {
         return petService.reportDeath(id, null);
     }
@@ -95,6 +105,7 @@ public class PetController {
     // Report permanent export of pet
     @PatchMapping("/{id}/export")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('OWNER', 'ADMIN')")
     public PetResponseDto exportPet(@PathVariable Long id) {
         return petService.recordPermanentExport(id, null);
     }
@@ -102,6 +113,7 @@ public class PetController {
     // Delete
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable Long id) {
         petService.deletePet(id);
     }
