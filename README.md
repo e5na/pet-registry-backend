@@ -43,6 +43,10 @@ Dedicated API endpoints exist for the following operations.
     - OWNER users can only see pets that belong to them, plus they can mark them deceased or lost.
     - VET users can register pets, register new microchips and check the list of all pets
     - ADMIN users can register new microchips, register new breeds (currently not implemented), manage users (currenly not implemented)
+ 
+## API documentation
+
+[API Documentation](docs/api.md)
 
 ### Notes:
 
