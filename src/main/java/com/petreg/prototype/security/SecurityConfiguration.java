@@ -33,7 +33,7 @@ public class SecurityConfiguration {
                 // Stop Spring Security re-triggering authentication on /error
                 .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 // Open public endpoints
-                .requestMatchers("/api/auth/**").permitAll()
+                // .requestMatchers("/api/auth/**").permitAll()
                 // Secure everything else
                 .anyRequest().authenticated()
             )
@@ -51,7 +51,7 @@ public class SecurityConfiguration {
     CorsConfigurationSource corsConfigurationSource(){
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:4200"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); 
