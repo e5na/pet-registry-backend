@@ -259,7 +259,7 @@ public class DemoDataSeeder {
                     user.setVetProfile(profile);
                 }
                 default -> {
-                    throw new RuntimeException("Unknown role");
+                    throw new ResourceNotFoundException("Unknown role");
                 }
             }
         }
