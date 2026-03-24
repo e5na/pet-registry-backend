@@ -3,6 +3,7 @@ package com.petreg.prototype.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.petreg.prototype.dto.SpeciesCreateDto;
@@ -25,6 +26,7 @@ public class SpeciesController {
     // Create
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public SpeciesResponseDto create(@Valid @RequestBody SpeciesCreateDto data) {
         return speciesService.createSpecies(data);
     }
@@ -32,6 +34,7 @@ public class SpeciesController {
     // Retrieve one
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("isAuthenticated()")
     public SpeciesResponseDto one(@PathVariable Long id) {
         return speciesService.getSpecies(id);
     }
@@ -39,6 +42,7 @@ public class SpeciesController {
     // Retrieve all
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("isAuthenticated()")
     public List<SpeciesResponseDto> all() {
         return speciesService.getAllSpecies();
     }
@@ -46,6 +50,7 @@ public class SpeciesController {
     // Update
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
     public SpeciesResponseDto update(
             @PathVariable Long id,
             @Valid @RequestBody SpeciesUpdateDto data) {
@@ -56,6 +61,7 @@ public class SpeciesController {
     // Delete
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable Long id) {
         speciesService.deleteSpecies(id);
     }

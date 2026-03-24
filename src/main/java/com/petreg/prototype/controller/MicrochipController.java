@@ -3,6 +3,7 @@ package com.petreg.prototype.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -36,6 +37,7 @@ public class MicrochipController {
     // Create
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('VET', 'ADMIN')")
     public MicrochipResponseDto create(@Valid @RequestBody MicrochipCreateDto data) {
         return microchipService.createMicrochip(data);
     }
@@ -43,6 +45,7 @@ public class MicrochipController {
     // Retrieve
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('OWNER', 'VET', 'ADMIN')")
     public MicrochipResponseDto one(@PathVariable Long id) {
         return microchipService.getMicrochip(id);
     }
@@ -50,6 +53,7 @@ public class MicrochipController {
     // Retrieve all
     @GetMapping("")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('VET', 'ADMIN')")
     public List<MicrochipResponseDto> all(
         @RequestParam(required = false) String chipNumber
     ) {
@@ -63,6 +67,7 @@ public class MicrochipController {
     // Update
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
     public MicrochipResponseDto update(@PathVariable Long id,
             @Valid @RequestBody MicrochipUpdateDto data) {
         return microchipService.updateMicrochip(id, data);
@@ -71,6 +76,7 @@ public class MicrochipController {
     // Delete
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void delete(@PathVariable Long id) {
         microchipService.deleteMicrochip(id);
     }
