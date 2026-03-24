@@ -74,6 +74,11 @@ public class PetEventService {
                     throw new BadRequestException("Only an owner can confirm an owner change");
                 }
             }
+            case OWNER_CHANGED -> {
+                if (roleName != RoleEnum.OWNER) {
+                    throw new BadRequestException("Only an owner can confirm an owner change");
+                }
+            }
             case LOST_REPORTED -> {
                 if (roleName != RoleEnum.OWNER) {
                     throw new BadRequestException("Only an owner can report a pet as lost");
@@ -118,6 +123,7 @@ public class PetEventService {
             case REGISTRATION -> "Pet registered";
             case OWNER_CHANGE_STARTED -> "Owner change started";
             case OWNER_CHANGE_CONFIRMED -> "Owner change confirmed";
+            case OWNER_CHANGED -> "Owner changed";
             case LOST_REPORTED -> "Pet reported lost";
             case FOUND_IN_SHELTER -> "Pet found in shelter";
             case RETURNED_TO_OWNER -> "Pet returned to owner";  
