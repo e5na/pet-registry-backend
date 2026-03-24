@@ -9,13 +9,13 @@ import com.petreg.prototype.model.type.RoleEnum;
 @RequestScope
 public class ActiveRoleContext {
 
-    private RoleEnum activeRole;
+    private RoleEnum activeRoleType;
 
-    public RoleEnum getActiveRole() {
-        return activeRole;
+    public RoleEnum getActiveRoleType() {
+        return activeRoleType;
     }
 
-    public void setActiveRole(RoleEnum activeRole) {
-        this.activeRole = activeRole;
+    public void setActiveRoleType(RoleEnum activeRoleType) {
+        this.activeRoleType = activeRoleType;
     }
 }

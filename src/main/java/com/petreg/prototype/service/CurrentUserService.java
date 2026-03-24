@@ -43,7 +43,7 @@ public class CurrentUserService {
     }
 
     public RoleEnum getActiveRoleEnum() {
-        RoleEnum activeRole = activeRoleContext.getActiveRole();
+        RoleEnum activeRole = activeRoleContext.getActiveRoleType();
 
         if (activeRole == null) {
             throw new BadRequestException("Active role is required");
