@@ -2,7 +2,6 @@ package com.petreg.prototype.service;
 
 import java.util.List;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.petreg.prototype.dto.PetCreateDto;
@@ -15,7 +14,6 @@ import com.petreg.prototype.mapper.PetMapper;
 import com.petreg.prototype.model.Breed;
 import com.petreg.prototype.model.Microchip;
 import com.petreg.prototype.model.Pet;
-import com.petreg.prototype.model.Role;
 import com.petreg.prototype.model.User;
 import com.petreg.prototype.model.type.PetLifeCycleEvent;
 import com.petreg.prototype.model.type.PetStatus;
@@ -23,6 +21,7 @@ import com.petreg.prototype.repository.BreedRepository;
 import com.petreg.prototype.repository.MicrochipRepository;
 import com.petreg.prototype.repository.PetRepository;
 import com.petreg.prototype.repository.UserRepository;
+import com.petreg.prototype.security.ActiveUserContext;
 
 import jakarta.transaction.Transactional;
 
@@ -34,30 +33,29 @@ public class PetService {
     private final MicrochipRepository microchipRepository;
     private final UserRepository userRepository;
     private final PetMapper petMapper;
-    private final CurrentUserService currentUserService;
     private final PetEventService petEventService;
+    private final ActiveUserContext activeUserContext;
 
     public PetService(
-        PetRepository petRepository,
-        BreedRepository breedRepository,
-        MicrochipRepository microchipRepository,
-        UserRepository userRepository,
-        PetMapper petMapper,
-        CurrentUserService currentUserService,
-        PetEventService petEventService
-    ) {
+            PetRepository petRepository,
+            BreedRepository breedRepository,
+            MicrochipRepository microchipRepository,
+            UserRepository userRepository,
+            PetMapper petMapper,
+            PetEventService petEventService,
+            ActiveUserContext activeUserContext) {
         this.petRepository = petRepository;
         this.breedRepository = breedRepository;
         this.microchipRepository = microchipRepository;
         this.userRepository = userRepository;
         this.petMapper = petMapper;
-        this.currentUserService = currentUserService;
         this.petEventService = petEventService;
+        this.activeUserContext = activeUserContext;
     }
 
     // Create
     @Transactional
-    public PetResponseDto createPet(PetCreateDto dto, Authentication authentication) {
+    public PetResponseDto createPet(PetCreateDto dto) {
 
         Breed breed = breedRepository.findById(dto.breedId())
             .orElseThrow(() -> new ResourceNotFoundException(
@@ -90,13 +88,10 @@ public class PetService {
         Pet pet = petMapper.fromDto(dto, breed, microchip, owner);
         Pet savedPet = petRepository.save(pet);
 
-        User currentUser = currentUserService.getAuthenticatedUser(authentication);
-        Role activeRole = currentUserService.getActiveRole(authentication);
-
         petEventService.logEvent(
             savedPet,
-            currentUser,
-            activeRole,
+            activeUserContext.getUser(),
+            activeUserContext.getActiveRoleType(),
             PetLifeCycleEvent.REGISTRATION,
             null
         );
@@ -176,7 +171,7 @@ public class PetService {
 
     // Report lost pet
     @Transactional
-    public PetResponseDto reportLost(Long id, String description, Authentication authentication) {
+    public PetResponseDto reportLost(Long id, String description) {
         Pet pet = petRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "Pet with id " + id + " not found"
@@ -194,16 +189,13 @@ public class PetService {
             throw new BadRequestException("Pet is already marked as lost");
         }
 
-        User currentUser = currentUserService.getAuthenticatedUser(authentication);
-        Role activeRole = currentUserService.getActiveRole(authentication);
-
         pet.setStatus(PetStatus.LOST);
         Pet savedPet = petRepository.save(pet);
 
         petEventService.logEvent(
             savedPet,
-            currentUser,
-            activeRole,
+            activeUserContext.getUser(),
+            activeUserContext.getActiveRoleType(),
             PetLifeCycleEvent.LOST_REPORTED,
             description
         );
@@ -213,7 +205,7 @@ public class PetService {
 
     // Report found pet
     @Transactional
-    public PetResponseDto markFoundInShelter(Long id, String description, Authentication authentication) {
+    public PetResponseDto markFoundInShelter(Long id, String description) {
         Pet pet = petRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "Pet with id " + id + " not found"
@@ -231,16 +223,13 @@ public class PetService {
             throw new BadRequestException("Only a lost pet can be marked as found in shelter");
         }
 
-        User currentUser = currentUserService.getAuthenticatedUser(authentication);
-        Role activeRole = currentUserService.getActiveRole(authentication);
-
         pet.setStatus(PetStatus.FOUND);
         Pet savedPet = petRepository.save(pet);
 
         petEventService.logEvent(
             savedPet,
-            currentUser,
-            activeRole,
+            activeUserContext.getUser(),
+            activeUserContext.getActiveRoleType(),
             PetLifeCycleEvent.FOUND_IN_SHELTER,
             description
         );
@@ -250,7 +239,7 @@ public class PetService {
 
     // Return pet to owner
     @Transactional
-    public PetResponseDto markReturnedToOwner(Long id, String description, Authentication authentication) {
+    public PetResponseDto markReturnedToOwner(Long id, String description) {
         Pet pet = petRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "Pet with id " + id + " not found"
@@ -268,16 +257,13 @@ public class PetService {
             throw new BadRequestException("Only a lost or found pet can be returned to owner");
         }
 
-        User currentUser = currentUserService.getAuthenticatedUser(authentication);
-        Role activeRole = currentUserService.getActiveRole(authentication);
-
         pet.setStatus(PetStatus.ACTIVE);
         Pet savedPet = petRepository.save(pet);
 
         petEventService.logEvent(
             savedPet,
-            currentUser,
-            activeRole,
+            activeUserContext.getUser(),
+            activeUserContext.getActiveRoleType(),
             PetLifeCycleEvent.RETURNED_TO_OWNER,
             description
         );
@@ -287,7 +273,7 @@ public class PetService {
 
     // Report death of pet
     @Transactional
-    public PetResponseDto reportDeath(Long id, String description, Authentication authentication) {
+    public PetResponseDto reportDeath(Long id, String description) {
         Pet pet = petRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "Pet with id " + id + " not found"
@@ -301,16 +287,13 @@ public class PetService {
             throw new BadRequestException("An exported pet cannot be marked as deceased");
         }
 
-        User currentUser = currentUserService.getAuthenticatedUser(authentication);
-        Role activeRole = currentUserService.getActiveRole(authentication);
-
         pet.setStatus(PetStatus.DECEASED);
         Pet savedPet = petRepository.save(pet);
 
         petEventService.logEvent(
             savedPet,
-            currentUser,
-            activeRole,
+            activeUserContext.getUser(),
+            activeUserContext.getActiveRoleType(),
             PetLifeCycleEvent.DEATH_REPORTED,
             description
         );
@@ -320,7 +303,7 @@ public class PetService {
 
     // Report permanent export of pet
     @Transactional
-    public PetResponseDto recordPermanentExport(Long id, String description, Authentication authentication) {
+    public PetResponseDto recordPermanentExport(Long id, String description) {
         Pet pet = petRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "Pet with id " + id + " not found"
@@ -334,16 +317,13 @@ public class PetService {
             throw new BadRequestException("Pet is already marked as exported");
         }
 
-        User currentUser = currentUserService.getAuthenticatedUser(authentication);
-        Role activeRole = currentUserService.getActiveRole(authentication);
-
         pet.setStatus(PetStatus.EXPORTED);
         Pet savedPet = petRepository.save(pet);
 
         petEventService.logEvent(
             savedPet,
-            currentUser,
-            activeRole,
+            activeUserContext.getUser(),
+            activeUserContext.getActiveRoleType(),
             PetLifeCycleEvent.PERMANENT_EXPORT,
             description
         );

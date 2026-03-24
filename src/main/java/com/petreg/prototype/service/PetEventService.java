@@ -14,6 +14,7 @@ import com.petreg.prototype.model.User;
 import com.petreg.prototype.model.type.PetLifeCycleEvent;
 import com.petreg.prototype.model.type.RoleEnum;
 import com.petreg.prototype.repository.PetEventRepository;
+import com.petreg.prototype.util.RoleUtil;
 
 @Service
 public class PetEventService {
@@ -32,11 +33,14 @@ public class PetEventService {
     public PetEventResponseDto logEvent(
         Pet pet,
         User user,
-        Role activeRole,
+        RoleEnum activeRoleType,
         PetLifeCycleEvent eventType,
         String description
     ) {
-        validateRoleForEvent(activeRole, eventType);
+        validateRoleForEvent(activeRoleType, eventType);
+
+        Role activeRole = RoleUtil.getRoleByTypeFromRoles(user.getRoles(), activeRoleType)
+                .orElseThrow(() -> new BadRequestException("Active role is required"));
 
         PetEvent event = new PetEvent(
             pet,
@@ -56,8 +60,8 @@ public class PetEventService {
             .toList();
     }
 
-    private void validateRoleForEvent(Role role, PetLifeCycleEvent eventType) {
-        RoleEnum roleName = role.getName();
+    private void validateRoleForEvent(RoleEnum roleType, PetLifeCycleEvent eventType) {
+        RoleEnum roleName = roleType;
         switch (eventType) {
             case REGISTRATION -> {
                 if (roleName != RoleEnum.ADMIN && roleName != RoleEnum.VET) {

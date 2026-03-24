@@ -1,7 +1,6 @@
 package com.petreg.prototype.controller;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,9 +28,8 @@ public class PetTransferController {
     @ResponseStatus(HttpStatus.CREATED)
     public PetTransferResponseDto create(
             @PathVariable Long petId,
-            @RequestBody PetTransferCreateDto data,
-            Authentication auth) {
-        return transferService.createTransfer(petId, data, auth);
+            @RequestBody PetTransferCreateDto data) {
+        return transferService.createTransfer(petId, data);
     }
 
     // Accept
@@ -39,9 +37,8 @@ public class PetTransferController {
     @ResponseStatus(HttpStatus.OK)
     public PetTransferResponseDto accept(
             @PathVariable Long petId,
-            @PathVariable Long id,
-            Authentication auth) {
-        return transferService.resolveTransfer(petId, id, true, auth);
+            @PathVariable Long id) {
+        return transferService.resolveTransfer(petId, id, true);
     }
 
     // Decline
@@ -49,9 +46,8 @@ public class PetTransferController {
     @ResponseStatus(HttpStatus.OK)
     public PetTransferResponseDto decline(
             @PathVariable Long petId,
-            @PathVariable Long id,
-            Authentication auth) {
-        return transferService.resolveTransfer(petId, id, false, auth);
+            @PathVariable Long id) {
+        return transferService.resolveTransfer(petId, id, false);
     }
 
     // Cancel
@@ -59,8 +55,7 @@ public class PetTransferController {
     @ResponseStatus(HttpStatus.OK)
     public void cancel(
             @PathVariable Long petId,
-            @PathVariable Long id,
-            Authentication auth) {
-        transferService.cancelTransfer(petId, id, auth);
+            @PathVariable Long id) {
+        transferService.cancelTransfer(petId, id);
     }
 }
