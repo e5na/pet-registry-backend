@@ -2,7 +2,6 @@ package com.petreg.prototype.service;
 
 import java.time.LocalDateTime;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,8 +46,7 @@ public class PetTransferService {
 
     public PetTransferResponseDto createTransfer(
             Long petId,
-            PetTransferCreateDto data,
-            Authentication auth) {
+            PetTransferCreateDto data) {
 
         // Load pet and verify current user is the owner
         Pet pet = petRepository.findById(petId)
@@ -92,8 +90,7 @@ public class PetTransferService {
     public PetTransferResponseDto resolveTransfer(
             Long petId,
             Long id,
-            boolean isAccepted,
-            Authentication auth) {
+            boolean isAccepted) {
         // Load the PENDING transfer
         PetTransfer transfer = transferRepository.findByIdAndStatus(id, TransferStatus.PENDING)
             .orElseThrow(() -> new ResourceNotFoundException("Pending transfer request not found"));
@@ -143,7 +140,7 @@ public class PetTransferService {
         return toDto(savedTransfer);
     }
 
-    public PetTransferResponseDto cancelTransfer(Long petId, Long id, Authentication auth) {
+    public PetTransferResponseDto cancelTransfer(Long petId, Long id) {
         PetTransfer transfer = transferRepository.findByIdAndStatus(id, TransferStatus.PENDING)
             .orElseThrow(() -> new ResourceNotFoundException("Pending transfer request not found"));
 

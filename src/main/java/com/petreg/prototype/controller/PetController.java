@@ -3,7 +3,6 @@ package com.petreg.prototype.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import com.petreg.prototype.dto.PetCreateDto;
@@ -30,8 +29,8 @@ public class PetController {
     // Create
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public PetResponseDto create(@Valid @RequestBody PetCreateDto data, Authentication authentication) {
-        return petService.createPet(data, authentication);
+    public PetResponseDto create(@Valid @RequestBody PetCreateDto data) {
+        return petService.createPet(data);
     }
 
     // Retrieve one
@@ -68,36 +67,36 @@ public class PetController {
     // Report lost pet
     @PatchMapping("/{id}/report-lost")
     @ResponseStatus(HttpStatus.OK)
-    public PetResponseDto reportLost(@PathVariable Long id, Authentication authentication) {
-        return petService.reportLost(id, null, authentication);
+    public PetResponseDto reportLost(@PathVariable Long id) {
+        return petService.reportLost(id, null);
     }
 
     // Report found pet
     @PatchMapping("/{id}/mark-found")
     @ResponseStatus(HttpStatus.OK)
-    public PetResponseDto markFound(@PathVariable Long id, Authentication authentication) {
-        return petService.markFoundInShelter(id, null, authentication);
+    public PetResponseDto markFound(@PathVariable Long id) {
+        return petService.markFoundInShelter(id, null);
     }
 
     // Return pet to owner
     @PatchMapping("/{id}/return-to-owner")
     @ResponseStatus(HttpStatus.OK)
-    public PetResponseDto returnToOwner(@PathVariable Long id, Authentication authentication) {
-        return petService.markReturnedToOwner(id, null, authentication);
+    public PetResponseDto returnToOwner(@PathVariable Long id) {
+        return petService.markReturnedToOwner(id, null);
     }
 
     // Report death of pet
     @PatchMapping("/{id}/report-death")
     @ResponseStatus(HttpStatus.OK)
-    public PetResponseDto reportDeath(@PathVariable Long id, Authentication authentication) {
-        return petService.reportDeath(id, null, authentication);
+    public PetResponseDto reportDeath(@PathVariable Long id) {
+        return petService.reportDeath(id, null);
     }
 
     // Report permanent export of pet
     @PatchMapping("/{id}/export")
     @ResponseStatus(HttpStatus.OK)
-    public PetResponseDto exportPet(@PathVariable Long id, Authentication authentication) {
-        return petService.recordPermanentExport(id, null, authentication);
+    public PetResponseDto exportPet(@PathVariable Long id) {
+        return petService.recordPermanentExport(id, null);
     }
 
     // Delete

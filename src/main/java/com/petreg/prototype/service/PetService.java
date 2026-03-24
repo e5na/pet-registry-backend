@@ -2,7 +2,6 @@ package com.petreg.prototype.service;
 
 import java.util.List;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.petreg.prototype.dto.PetCreateDto;
@@ -56,7 +55,7 @@ public class PetService {
 
     // Create
     @Transactional
-    public PetResponseDto createPet(PetCreateDto dto, Authentication authentication) {
+    public PetResponseDto createPet(PetCreateDto dto) {
 
         Breed breed = breedRepository.findById(dto.breedId())
             .orElseThrow(() -> new ResourceNotFoundException(
@@ -172,7 +171,7 @@ public class PetService {
 
     // Report lost pet
     @Transactional
-    public PetResponseDto reportLost(Long id, String description, Authentication authentication) {
+    public PetResponseDto reportLost(Long id, String description) {
         Pet pet = petRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "Pet with id " + id + " not found"
@@ -206,7 +205,7 @@ public class PetService {
 
     // Report found pet
     @Transactional
-    public PetResponseDto markFoundInShelter(Long id, String description, Authentication authentication) {
+    public PetResponseDto markFoundInShelter(Long id, String description) {
         Pet pet = petRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "Pet with id " + id + " not found"
@@ -240,7 +239,7 @@ public class PetService {
 
     // Return pet to owner
     @Transactional
-    public PetResponseDto markReturnedToOwner(Long id, String description, Authentication authentication) {
+    public PetResponseDto markReturnedToOwner(Long id, String description) {
         Pet pet = petRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "Pet with id " + id + " not found"
@@ -274,7 +273,7 @@ public class PetService {
 
     // Report death of pet
     @Transactional
-    public PetResponseDto reportDeath(Long id, String description, Authentication authentication) {
+    public PetResponseDto reportDeath(Long id, String description) {
         Pet pet = petRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "Pet with id " + id + " not found"
@@ -304,7 +303,7 @@ public class PetService {
 
     // Report permanent export of pet
     @Transactional
-    public PetResponseDto recordPermanentExport(Long id, String description, Authentication authentication) {
+    public PetResponseDto recordPermanentExport(Long id, String description) {
         Pet pet = petRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException(
                 "Pet with id " + id + " not found"
