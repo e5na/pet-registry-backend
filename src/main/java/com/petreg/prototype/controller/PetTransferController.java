@@ -13,6 +13,8 @@ import com.petreg.prototype.dto.PetTransferCreateDto;
 import com.petreg.prototype.dto.PetTransferResponseDto;
 import com.petreg.prototype.service.PetTransferService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/pets")
 public class PetTransferController {
@@ -28,7 +30,7 @@ public class PetTransferController {
     @ResponseStatus(HttpStatus.CREATED)
     public PetTransferResponseDto create(
             @PathVariable Long petId,
-            @RequestBody PetTransferCreateDto data) {
+            @Valid @RequestBody PetTransferCreateDto data) {
         return transferService.createTransfer(petId, data);
     }
 

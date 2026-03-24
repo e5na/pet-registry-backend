@@ -18,6 +18,8 @@ import com.petreg.prototype.dto.RoleResponseDto;
 import com.petreg.prototype.dto.RoleUpdateDto;
 import com.petreg.prototype.service.RoleService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/roles")
 public class RoleController {
@@ -33,7 +35,7 @@ public class RoleController {
     // Create
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public RoleResponseDto create(@RequestBody RoleCreateDto data) {
+    public RoleResponseDto create(@Valid @RequestBody RoleCreateDto data) {
         return roleService.createRole(data);
     }
 
@@ -55,7 +57,7 @@ public class RoleController {
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public RoleResponseDto update(@PathVariable Long id,
-            @RequestBody RoleUpdateDto data) {
+            @Valid @RequestBody RoleUpdateDto data) {
         return roleService.updateRole(id, data);
     }
 

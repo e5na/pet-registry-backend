@@ -13,6 +13,8 @@ import com.petreg.prototype.dto.UserResponseDto;
 import com.petreg.prototype.service.AuthService;
 import com.petreg.prototype.service.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -27,7 +29,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public void register(@RequestBody UserCreateDto data) {
+    public void register(@Valid @RequestBody UserCreateDto data) {
         userService.createUser(data);
     }
 
